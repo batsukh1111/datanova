@@ -99,22 +99,36 @@ button { cursor: pointer; }
 .nav a:hover, .nav a.active { color: var(--ink); }
 .lang-switch {
   display: inline-flex;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ink);
   overflow: hidden;
+  flex-shrink: 0;
 }
 .lang-switch button {
   border: 0;
   background: transparent;
-  padding: 7px 10px;
-  font-size: 12px;
-  letter-spacing: 0.06em;
+  padding: 7px 11px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--ink);
 }
 .lang-switch button.on {
   background: var(--ink);
   color: var(--paper);
 }
+.footer-lang {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+}
+.footer-lang button {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.footer-lang button.on { color: var(--ink); font-weight: 700; text-decoration: none; }
 .cart-link {
   display: inline-flex;
   align-items: center;

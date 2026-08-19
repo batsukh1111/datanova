@@ -135,8 +135,8 @@ function layout(inner) {
             <a href="#/about" class="${route === "about" ? "active" : ""}">${t("about")}</a>
           </nav>
           <div class="lang-switch" role="group" aria-label="Language">
-            <button type="button" data-lang="mn" class="${state.lang === "mn" ? "on" : ""}">MN</button>
-            <button type="button" data-lang="en" class="${state.lang === "en" ? "on" : ""}">EN</button>
+            <button type="button" data-lang="mn" class="${state.lang === "mn" ? "on" : ""}">Монгол</button>
+            <button type="button" data-lang="en" class="${state.lang === "en" ? "on" : ""}">English</button>
           </div>
           <a class="cart-link" href="#/cart">${t("cart")} ${count ? `<span class="cart-count">${count}</span>` : ""}</a>
         </div>
@@ -147,6 +147,11 @@ function layout(inner) {
       <div class="wrap footer-row">
         <div>${escapeHtml(store.name)} · ${escapeHtml(loc(store, "city"))}</div>
         <div>${escapeHtml(store.email)}</div>
+      </div>
+      <div class="wrap footer-lang">
+        <button type="button" data-lang="mn" class="${state.lang === "mn" ? "on" : ""}">Монгол</button>
+        <span aria-hidden="true">·</span>
+        <button type="button" data-lang="en" class="${state.lang === "en" ? "on" : ""}">English</button>
       </div>
       <div class="wrap" style="margin-top:10px">${escapeHtml(loc(store, "notice"))}</div>
     </footer>
