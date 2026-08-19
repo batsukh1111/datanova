@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import secrets
 import uuid
@@ -18,8 +19,8 @@ ROOT = Path(__file__).resolve().parent
 WEB = ROOT / "web"
 DATA = ROOT / "data"
 ORDERS = ROOT / "orders"
-HOST = "127.0.0.1"
-PORT = 8787
+HOST = os.environ.get("HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", "8787"))
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 PHONE_RE = re.compile(r"^[0-9+\-\s()]{6,20}$")
@@ -50,10 +51,13 @@ def load_products() -> dict:
 
 
 def load_admin() -> dict:
+    env_pw = os.environ.get("ADMIN_PASSWORD", "").strip()
+    if env_pw:
+        return {"password": env_pw}
     path = DATA / "admin.json"
-    if not path.exists():
-        return {"password": "DataNova1"}
-    return read_json(path)
+    if path.exists():
+        return read_json(path)
+    return {"password": "DataNova1"}
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -484,10 +488,13 @@ def public_order(order: dict) -> dict:
 
 def main() -> None:
     ORDERS.mkdir(exist_ok=True)
+    DATA.mkdir(exist_ok=True)
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"DataNova нээлттэй: http://{HOST}:{PORT}")
-    print(f"Удирдлага: http://{HOST}:{PORT}/admin")
-    print("Зогсоох: Ctrl+C")
+    print(f"DataNova нээлттэй: http://{HOST}:{PORT}", flush=True)
+    print(f"Удирдлага: http://{HOST}:{PORT}/admin", flush=True)
+    if os.environ.get("RENDER"):
+        print("Render дээр ажиллаж байна.", flush=True)
+    print("Зогсоох: Ctrl+C", flush=True)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

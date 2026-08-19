@@ -9,4 +9,5 @@ _debug_search.py
 _debug_api.py
 *.log
 .DS_Store
+cloudflared.exe
 
