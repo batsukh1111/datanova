@@ -123,9 +123,9 @@ function viewHome() {
     <div class="wrap">
       <section class="hero">
         <div>
-          <p class="kicker">Тайлан · өгөгдөл · тойм</p>
-          <h1>Тоог уншихад бэлэн болгоно</h1>
-          <p class="lede">${escapeHtml(state.store.description)} Бэлэн курсийн ажил зардаггүй. Өөрийнхөө ажлыг хийх, шийдвэр гаргахад зориулна.</p>
+          <p class="kicker">${escapeHtml(state.store.kicker || "Тайлан · өгөгдөл · тойм")}</p>
+          <h1>${escapeHtml(state.store.headline || state.store.name)}</h1>
+          <p class="lede">${escapeHtml(state.store.description)}</p>
           <div class="hero-actions">
             <a class="btn" href="#/catalog">Дэлгүүр үзэх</a>
             <a class="btn ghost" href="#/about">Хэрхэн ажилладаг вэ</a>
@@ -135,7 +135,7 @@ function viewHome() {
           <p><strong>1.</strong> Тайлан эсвэл хүснэгтээ сонгоно.</p>
           <p><strong>2.</strong> Банкаар төлнө. Захиалгын дугаараа утга дээр бичнэ.</p>
           <p><strong>3.</strong> ${escapeHtml(state.store.fulfillmentHours)} имэйлээр файл ирнэ.</p>
-          <p>Одоогийн жишээ бүтээгдэхүүн. Та өөрийн датагаа оруулахад энэ хэсэг солигдоно.</p>
+          ${state.store.heroAside ? `<p>${escapeHtml(state.store.heroAside)}</p>` : ""}
         </aside>
       </section>
 
@@ -143,7 +143,7 @@ function viewHome() {
         <div class="section-head">
           <div>
             <h2>Онцлох</h2>
-            <p class="hint">Жишээ каталог. Үнэ, нэр, агуулгыг дараа сольно.</p>
+            <p class="hint">${escapeHtml(state.store.featuredHint || "")}</p>
           </div>
           <a href="#/catalog">Бүгдийг харах</a>
         </div>

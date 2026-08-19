@@ -208,8 +208,14 @@ function viewStore() {
     <form id="store-form" class="buy-box" method="post" action="#">
       <h2>Дэлгүүрийн мэдээлэл</h2>
       <label>Нэр<input name="name" required value="${escapeAttr(s.name || "")}"></label>
-      <label>Уриа<input name="tagline" value="${escapeAttr(s.tagline || "")}"></label>
-      <label>Тайлбар<textarea name="description" rows="3">${escapeHtml(s.description || "")}</textarea></label>
+      <label>Уриа (логоны доор)<input name="tagline" value="${escapeAttr(s.tagline || "")}"></label>
+      <h2>Нүүр хуудасны үг</h2>
+      <label>Дээд жижиг үг<input name="kicker" value="${escapeAttr(s.kicker || "")}"></label>
+      <label>Том гарчиг<input name="headline" value="${escapeAttr(s.headline || "")}"></label>
+      <label>Том тайлбар<textarea name="description" rows="3">${escapeHtml(s.description || "")}</textarea></label>
+      <label>Баруун талын нэмэлт үг<textarea name="heroAside" rows="2">${escapeHtml(s.heroAside || "")}</textarea></label>
+      <label>Онцлох хэсгийн тайлбар<input name="featuredHint" value="${escapeAttr(s.featuredHint || "")}"></label>
+      <label>Доод мэдэгдэл<textarea name="notice" rows="2">${escapeHtml(s.notice || "")}</textarea></label>
       <label>Имэйл<input name="email" type="email" value="${escapeAttr(s.email || "")}"></label>
       <label>Утас<input name="phone" value="${escapeAttr(s.phone || "")}"></label>
       <label>Хот<input name="city" value="${escapeAttr(s.city || "")}"></label>
@@ -306,7 +312,12 @@ document.addEventListener("submit", async (event) => {
         body: JSON.stringify({
           name: data.get("name"),
           tagline: data.get("tagline"),
+          kicker: data.get("kicker"),
+          headline: data.get("headline"),
           description: data.get("description"),
+          heroAside: data.get("heroAside"),
+          featuredHint: data.get("featuredHint"),
+          notice: data.get("notice"),
           email: data.get("email"),
           phone: data.get("phone"),
           city: data.get("city"),
