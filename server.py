@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import mimetypes
 import os
@@ -66,6 +68,28 @@ def normalize_password(raw: str) -> str:
     if value.startswith("ADMIN_PASSWORD") and "=" in value:
         value = value.split("=", 1)[1].strip().strip('"').strip("'")
     return value
+
+
+def token_key() -> bytes:
+    return (normalize_password(os.environ.get("ADMIN_PASSWORD", "")) or "DataNova1").encode("utf-8")
+
+
+def issue_token() -> str:
+    raw = secrets.token_hex(16)
+    sig = hmac.new(token_key(), raw.encode("utf-8"), hashlib.sha256).hexdigest()
+    return f"{raw}.{sig}"
+
+
+def valid_token(token: str) -> bool:
+    if not token:
+        return False
+    if token in ADMIN_TOKENS:
+        return True
+    if "." not in token:
+        return False
+    raw, sig = token.rsplit(".", 1)
+    expected = hmac.new(token_key(), raw.encode("utf-8"), hashlib.sha256).hexdigest()
+    return secrets.compare_digest(sig, expected)
 
 
 def passwords_match(given: str, expected: str) -> bool:
@@ -209,51 +233,62 @@ class Handler(SimpleHTTPRequestHandler):
             if not passwords_match(password, expected):
                 self._json(401, {"error": "password"})
                 return
-            token = secrets.token_hex(24)
+            token = issue_token()
             ADMIN_TOKENS.add(token)
             self._json(200, {"token": token})
+            return
+        if path in ("/api/admin/store", "/api/admin/products", "/api/admin/password") or path.startswith(
+            "/api/admin/orders/"
+        ):
+            self._admin_write(path)
             return
         self._json(404, {"error": "not_found"})
 
     def do_PUT(self) -> None:
         parsed = urlparse(self.path)
-        path = parsed.path
+        self._admin_write(parsed.path)
+
+    def _admin_write(self, path: str) -> None:
         if not self._admin_ok():
             return
-        payload, err = self._read_json(200_000)
+        payload, err = self._read_json(400_000)
         if err:
             self._json(400, {"error": err})
             return
-        if path == "/api/admin/store":
-            saved, save_err = save_store(payload)
-            if save_err:
-                self._json(400, {"error": save_err})
+        try:
+            if path == "/api/admin/store":
+                saved, save_err = save_store(payload)
+                if save_err:
+                    self._json(400, {"error": save_err})
+                    return
+                self._json(200, {"store": saved})
                 return
-            self._json(200, {"store": saved})
-            return
-        if path == "/api/admin/products":
-            saved, save_err = save_product(payload)
-            if save_err:
-                self._json(400, {"error": save_err})
+            if path == "/api/admin/products":
+                saved, save_err = save_product(payload)
+                if save_err:
+                    self._json(400, {"error": save_err})
+                    return
+                self._json(200, {"product": saved})
                 return
-            self._json(200, {"product": saved})
-            return
-        if path == "/api/admin/password":
-            new_password = str(payload.get("password") or "").strip()
-            if len(new_password) < 6:
-                self._json(400, {"error": "password"})
+            if path == "/api/admin/password":
+                new_password = str(payload.get("password") or "").strip()
+                if len(new_password) < 6:
+                    self._json(400, {"error": "password"})
+                    return
+                write_json(DATA / "admin.json", {"password": new_password})
+                ADMIN_TOKENS.clear()
+                self._json(200, {"ok": True})
                 return
-            write_json(DATA / "admin.json", {"password": new_password})
-            ADMIN_TOKENS.clear()
-            self._json(200, {"ok": True})
-            return
-        if path.startswith("/api/admin/orders/"):
-            order_id = path.rsplit("/", 1)[-1]
-            saved, save_err = update_order_status(order_id, payload)
-            if save_err:
-                self._json(400 if save_err != "not_found" else 404, {"error": save_err})
+            if path.startswith("/api/admin/orders/"):
+                order_id = path.rsplit("/", 1)[-1]
+                saved, save_err = update_order_status(order_id, payload)
+                if save_err:
+                    self._json(400 if save_err != "not_found" else 404, {"error": save_err})
+                    return
+                self._json(200, {"order": saved})
                 return
-            self._json(200, {"order": saved})
+        except OSError:
+            self._json(500, {"error": "write_failed"})
             return
         self._json(404, {"error": "not_found"})
 
@@ -273,7 +308,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def _admin_ok(self) -> bool:
         token = self.headers.get("X-Admin-Token", "")
-        if token and token in ADMIN_TOKENS:
+        if valid_token(token):
             return True
         self._json(401, {"error": "auth"})
         return False

@@ -55,9 +55,10 @@ async function api(path, options = {}) {
   if (res.status === 401) {
     state.token = "";
     sessionStorage.removeItem(TOKEN_KEY);
+    state.loginError = "Нэвтрэлт дууссан. Дахин нэвтэрнэ үү.";
     throw new Error("auth");
   }
-  if (!res.ok) throw new Error(body.error || "fail");
+  if (!res.ok) throw new Error(body.error || `http_${res.status}`);
   return body;
 }
 
@@ -215,7 +216,7 @@ function viewStore() {
   const s = state.store || {};
   const b = s.bank || {};
   return `
-    <form id="store-form" class="buy-box" method="post" action="#">
+    <form id="store-form" class="buy-box" method="post" action="#" novalidate>
       <h2>Дэлгүүрийн мэдээлэл</h2>
       <label>Нэр<input name="name" required value="${escapeAttr(s.name || "")}"></label>
       <label>Уриа MN<input name="tagline" value="${escapeAttr(s.tagline || "")}"></label>
@@ -247,7 +248,7 @@ function viewStore() {
         </div>
       `).join("")}
       <button class="btn ghost" type="button" data-action="aud-add">+ Хэн нэг нэмэх</button>
-      <label>Имэйл<input name="email" type="email" value="${escapeAttr(s.email || "")}"></label>
+      <label>Имэйл<input name="email" value="${escapeAttr(s.email || "")}"></label>
       <label>Утас<input name="phone" value="${escapeAttr(s.phone || "")}"></label>
       <label>Хот MN<input name="city" value="${escapeAttr(s.city || "")}"></label>
       <label>City EN<input name="cityEn" value="${escapeAttr(s.cityEn || "")}"></label>
@@ -260,7 +261,7 @@ function viewStore() {
       <label>Хүлээн авагч<input name="accountName" value="${escapeAttr(b.accountName || "")}"></label>
       <label>Тэмдэглэл MN<textarea name="note" rows="3">${escapeHtml(b.note || "")}</textarea></label>
       <label>Note EN<textarea name="noteEn" rows="3">${escapeHtml(b.noteEn || "")}</textarea></label>
-      <button class="btn" type="submit">Хадгалах</button>
+      <button class="btn" type="button" data-action="save-store">Хадгалах</button>
     </form>
     <form id="password-form" class="buy-box" style="margin-top:16px" method="post" action="#">
       <h2>Нууц үг солих</h2>
@@ -302,6 +303,67 @@ function readAudienceFromForm() {
   return items;
 }
 
+function saveErrorMessage(err) {
+  const code = String(err?.message || err || "");
+  if (code === "auth" || code === "password") return "Нэвтрэлт дууссан. Дахин нэвтэрнэ үү.";
+  if (code === "email") return "Имэйл хаяг буруу байна.";
+  if (code === "name") return "Нэрээ бичнэ үү.";
+  if (code === "title") return "Тайлангийн нэрийг бичнэ үү.";
+  if (code === "price") return "Үнээ зөв бичнэ үү.";
+  if (code === "write_failed") return "Файл хадгалахад алдаа гарлаа.";
+  return "Хадгалж чадсангүй. Дахин оролдоно уу.";
+}
+
+async function saveStoreForm(form) {
+  const data = new FormData(form);
+  try {
+    const saved = await api("/api/admin/store", {
+      method: "PUT",
+      body: JSON.stringify({
+        name: data.get("name"),
+        tagline: data.get("tagline"),
+        taglineEn: data.get("taglineEn"),
+        kicker: data.get("kicker"),
+        kickerEn: data.get("kickerEn"),
+        headline: data.get("headline"),
+        headlineEn: data.get("headlineEn"),
+        description: data.get("description"),
+        descriptionEn: data.get("descriptionEn"),
+        heroAside: data.get("heroAside"),
+        heroAsideEn: data.get("heroAsideEn"),
+        featuredHint: data.get("featuredHint"),
+        featuredHintEn: data.get("featuredHintEn"),
+        notice: data.get("notice"),
+        noticeEn: data.get("noticeEn"),
+        audienceTitle: data.get("audienceTitle"),
+        audienceTitleEn: data.get("audienceTitleEn"),
+        audience: readAudienceFromForm(),
+        email: data.get("email"),
+        phone: data.get("phone"),
+        city: data.get("city"),
+        cityEn: data.get("cityEn"),
+        fulfillmentHours: data.get("fulfillmentHours"),
+        fulfillmentHoursEn: data.get("fulfillmentHoursEn"),
+        bank: {
+          bankName: data.get("bankName"),
+          bankNameEn: data.get("bankNameEn"),
+          account: data.get("account"),
+          accountName: data.get("accountName"),
+          note: data.get("note"),
+          noteEn: data.get("noteEn"),
+        },
+      }),
+    });
+    state.store = saved.store;
+    state.audience = [...(saved.store.audience || [])];
+    state.notice = "Хадгаллаа. Дэлгүүр хуудсыг шинэчилбэл харагдана.";
+    state.error = "";
+  } catch (err) {
+    state.error = saveErrorMessage(err);
+  }
+  render();
+}
+
 async function saveProductForm(form) {
   const data = new FormData(form);
   try {
@@ -339,8 +401,8 @@ async function saveProductForm(form) {
     state.notice = "Тайлан хадгалагдлаа. Дэлгүүр хуудсыг шинэчилбэл харагдана.";
     state.error = "";
     await loadAll();
-  } catch {
-    state.error = "Тайлан хадгалагдангүй.";
+  } catch (err) {
+    state.error = saveErrorMessage(err);
   }
   render();
 }
@@ -370,53 +432,7 @@ document.addEventListener("submit", async (event) => {
   }
   if (event.target.id === "store-form") {
     event.preventDefault();
-    const data = new FormData(event.target);
-    try {
-      const saved = await api("/api/admin/store", {
-        method: "PUT",
-        body: JSON.stringify({
-          name: data.get("name"),
-          tagline: data.get("tagline"),
-          taglineEn: data.get("taglineEn"),
-          kicker: data.get("kicker"),
-          kickerEn: data.get("kickerEn"),
-          headline: data.get("headline"),
-          headlineEn: data.get("headlineEn"),
-          description: data.get("description"),
-          descriptionEn: data.get("descriptionEn"),
-          heroAside: data.get("heroAside"),
-          heroAsideEn: data.get("heroAsideEn"),
-          featuredHint: data.get("featuredHint"),
-          featuredHintEn: data.get("featuredHintEn"),
-          notice: data.get("notice"),
-          noticeEn: data.get("noticeEn"),
-          audienceTitle: data.get("audienceTitle"),
-          audienceTitleEn: data.get("audienceTitleEn"),
-          audience: readAudienceFromForm(),
-          email: data.get("email"),
-          phone: data.get("phone"),
-          city: data.get("city"),
-          cityEn: data.get("cityEn"),
-          fulfillmentHours: data.get("fulfillmentHours"),
-          fulfillmentHoursEn: data.get("fulfillmentHoursEn"),
-          bank: {
-            bankName: data.get("bankName"),
-            bankNameEn: data.get("bankNameEn"),
-            account: data.get("account"),
-            accountName: data.get("accountName"),
-            note: data.get("note"),
-            noteEn: data.get("noteEn"),
-          },
-        }),
-      });
-      state.store = saved.store;
-      state.audience = [...(saved.store.audience || [])];
-      state.notice = "Дэлгүүрийн мэдээлэл хадгалагдлаа.";
-      state.error = "";
-    } catch {
-      state.error = "Хадгалж чадсангүй.";
-    }
-    render();
+    await saveStoreForm(event.target);
     return;
   }
   if (event.target.id === "product-form") {
@@ -486,6 +502,11 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-action=new-product]")) {
     state.editing = { published: true, featured: false, formats: ["PDF"], category: "report" };
     render();
+    return;
+  }
+  if (event.target.closest("[data-action=save-store]")) {
+    const form = document.getElementById("store-form");
+    if (form) await saveStoreForm(form);
     return;
   }
   if (event.target.closest("[data-action=save-product]")) {
