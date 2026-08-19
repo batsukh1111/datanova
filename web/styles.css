@@ -423,6 +423,25 @@ input, textarea, select {
   padding: 8px 10px;
 }
 .admin-toolbar { margin-bottom: 14px; }
+.admin-savebar {
+  position: sticky;
+  top: 68px;
+  z-index: 8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 12px 14px;
+  margin: -20px -20px 20px;
+}
+.admin-savebar .btn {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+  min-width: 120px;
+}
 .aud-row {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr auto;

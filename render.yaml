@@ -14,3 +14,7 @@ services:
         value: 0.0.0.0
       - key: ADMIN_PASSWORD
         generateValue: true
+      - key: GITHUB_REPO
+        value: batsukh1111/datanova
+      - key: GITHUB_TOKEN
+        sync: false

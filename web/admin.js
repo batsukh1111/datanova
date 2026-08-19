@@ -1,4 +1,5 @@
 const TOKEN_KEY = "datanova-admin-token";
+const BACKUP_KEY = "datanova-admin-backup";
 
 const CATEGORIES = [
   { id: "briefing", label: "Тойм" },
@@ -217,7 +218,10 @@ function viewStore() {
   const b = s.bank || {};
   return `
     <form id="store-form" class="buy-box" method="post" action="#" novalidate>
-      <h2>Дэлгүүрийн мэдээлэл</h2>
+      <div class="admin-savebar">
+        <span>Нүүрний үг, «Хэнд зориулсан бэ» — энд дарж хадгална</span>
+        <button class="btn" type="button" data-action="save-store">Хадгалах</button>
+      </div>
       <label>Нэр<input name="name" required value="${escapeAttr(s.name || "")}"></label>
       <label>Уриа MN<input name="tagline" value="${escapeAttr(s.tagline || "")}"></label>
       <label>Tagline EN<input name="taglineEn" value="${escapeAttr(s.taglineEn || "")}"></label>
@@ -248,6 +252,10 @@ function viewStore() {
         </div>
       `).join("")}
       <button class="btn ghost" type="button" data-action="aud-add">+ Хэн нэг нэмэх</button>
+      <div class="admin-actions" style="margin:16px 0 28px">
+        <button class="btn" type="button" data-action="save-store">Хадгалах</button>
+      </div>
+      <h2>Дэлгүүрийн мэдээлэл</h2>
       <label>Имэйл<input name="email" value="${escapeAttr(s.email || "")}"></label>
       <label>Утас<input name="phone" value="${escapeAttr(s.phone || "")}"></label>
       <label>Хот MN<input name="city" value="${escapeAttr(s.city || "")}"></label>
@@ -269,6 +277,42 @@ function viewStore() {
       <button class="btn ghost" type="submit">Солих</button>
     </form>
   `;
+}
+
+function writeBackup() {
+  try {
+    localStorage.setItem(BACKUP_KEY, JSON.stringify({
+      at: Date.now(),
+      store: state.store,
+      products: state.products,
+    }));
+  } catch {
+    /* ignore */
+  }
+}
+
+function readBackup() {
+  try {
+    return JSON.parse(localStorage.getItem(BACKUP_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+
+async function restoreBackupToServer() {
+  const backup = readBackup();
+  if (!backup?.store) return false;
+  await api("/api/admin/store", {
+    method: "PUT",
+    body: JSON.stringify(backup.store),
+  });
+  if (Array.isArray(backup.products) && backup.products.length) {
+    await api("/api/admin/catalog", {
+      method: "PUT",
+      body: JSON.stringify({ products: backup.products }),
+    });
+  }
+  return true;
 }
 
 async function loadAll() {
@@ -358,6 +402,7 @@ async function saveStoreForm(form) {
     state.audience = [...(saved.store.audience || [])];
     state.notice = "Хадгаллаа. Дэлгүүр хуудсыг шинэчилбэл харагдана.";
     state.error = "";
+    writeBackup();
   } catch (err) {
     state.error = saveErrorMessage(err);
   }
@@ -401,6 +446,7 @@ async function saveProductForm(form) {
     state.notice = "Тайлан хадгалагдлаа. Дэлгүүр хуудсыг шинэчилбэл харагдана.";
     state.error = "";
     await loadAll();
+    writeBackup();
   } catch (err) {
     state.error = saveErrorMessage(err);
   }
@@ -414,6 +460,11 @@ async function login(password) {
   });
   state.token = body.token;
   sessionStorage.setItem(TOKEN_KEY, body.token);
+  try {
+    await restoreBackupToServer();
+  } catch {
+    /* first login or empty backup */
+  }
   await loadAll();
 }
 

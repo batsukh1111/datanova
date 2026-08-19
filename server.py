@@ -237,9 +237,12 @@ class Handler(SimpleHTTPRequestHandler):
             ADMIN_TOKENS.add(token)
             self._json(200, {"token": token})
             return
-        if path in ("/api/admin/store", "/api/admin/products", "/api/admin/password") or path.startswith(
-            "/api/admin/orders/"
-        ):
+        if path in (
+            "/api/admin/store",
+            "/api/admin/products",
+            "/api/admin/catalog",
+            "/api/admin/password",
+        ) or path.startswith("/api/admin/orders/"):
             self._admin_write(path)
             return
         self._json(404, {"error": "not_found"})
@@ -269,6 +272,13 @@ class Handler(SimpleHTTPRequestHandler):
                     self._json(400, {"error": save_err})
                     return
                 self._json(200, {"product": saved})
+                return
+            if path == "/api/admin/catalog":
+                saved, save_err = save_catalog(payload)
+                if save_err:
+                    self._json(400, {"error": save_err})
+                    return
+                self._json(200, saved)
                 return
             if path == "/api/admin/password":
                 new_password = str(payload.get("password") or "").strip()
@@ -412,6 +422,7 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
         "noteEn": str(bank_in.get("noteEn") or current.get("bank", {}).get("noteEn") or "")[:300],
     }
     write_json(DATA / "store.json", current)
+    push_data_files()
     return current, None
 
 
@@ -523,7 +534,58 @@ def save_product(payload: dict) -> tuple[dict | None, str | None]:
 
     catalog["products"] = products
     write_json(DATA / "products.json", catalog)
+    push_data_files()
     return existing, None
+
+
+def save_catalog(payload: dict) -> tuple[dict | None, str | None]:
+    products = payload.get("products")
+    if not isinstance(products, list) or not products:
+        return None, "products"
+    catalog = load_catalog()
+    catalog["products"] = products
+    write_json(DATA / "products.json", catalog)
+    push_data_files()
+    return catalog, None
+
+
+def push_data_files() -> None:
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        return
+    repo = os.environ.get("GITHUB_REPO", "batsukh1111/datanova")
+    for rel in ("data/store.json", "data/products.json"):
+        try:
+            push_github_file(repo, token, rel, (ROOT / rel).read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+
+def push_github_file(repo: str, token: str, rel: str, content: str) -> None:
+    import base64
+    from urllib.request import Request, urlopen
+
+    api = f"https://api.github.com/repos/{repo}/contents/{rel}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "datanova",
+    }
+    sha = None
+    try:
+        with urlopen(Request(api, headers=headers), timeout=20) as res:
+            sha = json.loads(res.read().decode("utf-8")).get("sha")
+    except Exception:
+        sha = None
+    body = {
+        "message": "Админаас сайт шинэчлэв",
+        "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+        "branch": "main",
+    }
+    if sha:
+        body["sha"] = sha
+    req = Request(api, data=json.dumps(body).encode("utf-8"), headers=headers, method="PUT")
+    urlopen(req, timeout=20).read()
 
 
 def delete_product(pid: str) -> tuple[bool, str | None]:
