@@ -24,6 +24,7 @@ const state = {
   error: "",
   notice: "",
   loginError: "",
+  audience: [],
 };
 
 function money(n) {
@@ -216,6 +217,17 @@ function viewStore() {
       <label>Баруун талын нэмэлт үг<textarea name="heroAside" rows="2">${escapeHtml(s.heroAside || "")}</textarea></label>
       <label>Онцлох хэсгийн тайлбар<input name="featuredHint" value="${escapeAttr(s.featuredHint || "")}"></label>
       <label>Доод мэдэгдэл<textarea name="notice" rows="2">${escapeHtml(s.notice || "")}</textarea></label>
+      <h2>Хэнд зориулсан бэ</h2>
+      <p class="muted">Нүүрэн дээрх хайрцагнууд. Нэмж, хасаж, үгийг нь солино.</p>
+      <label>Хэсгийн гарчиг<input name="audienceTitle" value="${escapeAttr(s.audienceTitle || "Хэнд зориулсан бэ")}"></label>
+      ${(state.audience || []).map((item, index) => `
+        <div class="aud-row">
+          <label>Нэр<input name="aud-title-${index}" value="${escapeAttr(item.title || "")}" placeholder="Жишээ: Багш"></label>
+          <label>Тайлбар<input name="aud-text-${index}" value="${escapeAttr(item.text || "")}" placeholder="Энэ хүнд юу өгөх вэ"></label>
+          <button class="linkish" type="button" data-aud-remove="${index}">Хасах</button>
+        </div>
+      `).join("")}
+      <button class="btn ghost" type="button" data-action="aud-add">+ Хэн нэг нэмэх</button>
       <label>Имэйл<input name="email" type="email" value="${escapeAttr(s.email || "")}"></label>
       <label>Утас<input name="phone" value="${escapeAttr(s.phone || "")}"></label>
       <label>Хот<input name="city" value="${escapeAttr(s.city || "")}"></label>
@@ -244,6 +256,20 @@ async function loadAll() {
   state.orders = orders.orders || [];
   state.products = products.products || [];
   state.store = store.store;
+  state.audience = [...(store.store?.audience || [])];
+}
+
+function readAudienceFromForm() {
+  const form = document.getElementById("store-form");
+  if (!form) return state.audience || [];
+  const items = [];
+  for (let index = 0; index < 12; index += 1) {
+    const title = form.elements[`aud-title-${index}`];
+    const text = form.elements[`aud-text-${index}`];
+    if (!title) break;
+    items.push({ title: title.value, text: text ? text.value : "" });
+  }
+  return items;
 }
 
 async function saveProductForm(form) {
@@ -318,6 +344,8 @@ document.addEventListener("submit", async (event) => {
           heroAside: data.get("heroAside"),
           featuredHint: data.get("featuredHint"),
           notice: data.get("notice"),
+          audienceTitle: data.get("audienceTitle"),
+          audience: readAudienceFromForm(),
           email: data.get("email"),
           phone: data.get("phone"),
           city: data.get("city"),
@@ -331,6 +359,7 @@ document.addEventListener("submit", async (event) => {
         }),
       });
       state.store = saved.store;
+      state.audience = [...(saved.store.audience || [])];
       state.notice = "Дэлгүүрийн мэдээлэл хадгалагдлаа.";
       state.error = "";
     } catch {
@@ -366,6 +395,22 @@ document.addEventListener("click", async (event) => {
     state.tab = tab.getAttribute("data-tab");
     state.notice = "";
     state.error = "";
+    if (state.tab === "store") {
+      state.audience = [...(state.store?.audience || [])];
+    }
+    render();
+    return;
+  }
+  if (event.target.closest("[data-action=aud-add]")) {
+    state.audience = readAudienceFromForm();
+    if (state.audience.length < 12) state.audience.push({ title: "", text: "" });
+    render();
+    return;
+  }
+  const audRemove = event.target.closest("[data-aud-remove]");
+  if (audRemove) {
+    state.audience = readAudienceFromForm();
+    state.audience.splice(Number(audRemove.getAttribute("data-aud-remove")), 1);
     render();
     return;
   }

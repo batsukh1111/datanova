@@ -347,6 +347,9 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
             "heroAside": str(payload.get("heroAside") if payload.get("heroAside") is not None else current.get("heroAside") or "")[:300],
             "featuredHint": str(payload.get("featuredHint") if payload.get("featuredHint") is not None else current.get("featuredHint") or "")[:200],
             "notice": str(payload.get("notice") if payload.get("notice") is not None else current.get("notice") or "")[:300],
+            "audienceTitle": str(
+                payload.get("audienceTitle") if payload.get("audienceTitle") is not None else current.get("audienceTitle") or ""
+            )[:80],
             "email": email[:120],
             "phone": str(payload.get("phone") or "")[:30],
             "city": str(payload.get("city") or current.get("city") or "")[:80],
@@ -355,6 +358,8 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
             )[:80],
         }
     )
+    if "audience" in payload:
+        current["audience"] = parse_audience(payload.get("audience"))
     current["bank"] = {
         "bankName": str(bank_in.get("bankName") or current.get("bank", {}).get("bankName") or "")[:80],
         "account": str(bank_in.get("account") or current.get("bank", {}).get("account") or "")[:40],
@@ -363,6 +368,20 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
     }
     write_json(DATA / "store.json", current)
     return current, None
+
+
+def parse_audience(raw) -> list[dict]:
+    items = []
+    if not isinstance(raw, list):
+        return items
+    for row in raw[:12]:
+        if not isinstance(row, dict):
+            continue
+        title = str(row.get("title") or "").strip()[:80]
+        text = str(row.get("text") or "").strip()[:240]
+        if title or text:
+            items.append({"title": title, "text": text})
+    return items
 
 
 def save_product(payload: dict) -> tuple[dict | None, str | None]:

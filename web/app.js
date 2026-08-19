@@ -150,15 +150,21 @@ function viewHome() {
         <div class="grid">${featured.map(productCard).join("")}</div>
       </section>
 
+      ${audienceSection()}
+    </div>
+  `;
+}
+
+function audienceSection() {
+  const items = (state.store.audience || []).filter((item) => item.title || item.text);
+  if (!items.length) return "";
+  return `
       <section class="section">
-        <h2>Хэнд зориулсан бэ</h2>
+        <h2>${escapeHtml(state.store.audienceTitle || "Хэнд зориулсан бэ")}</h2>
         <div class="audience" style="margin-top:16px">
-          <div class="who"><b>Байгууллага</b><p>Үнэ, инфляц, зах зээлийн тоймыг хурдан уншина.</p></div>
-          <div class="who"><b>Судлаач, сэтгүүлч</b><p>Цэвэр хүснэгт, эх сурвалжтай дүгнэлт авна.</p></div>
-          <div class="who"><b>Оюутан</b><p>Зөвхөн бичих заавар, загвар. Бэлэн ажил биш.</p></div>
+          ${items.map((item) => `<div class="who"><b>${escapeHtml(item.title)}</b><p>${escapeHtml(item.text)}</p></div>`).join("")}
         </div>
       </section>
-    </div>
   `;
 }
 
