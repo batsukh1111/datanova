@@ -52,13 +52,28 @@ def load_products() -> dict:
 
 
 def load_admin() -> dict:
-    env_pw = os.environ.get("ADMIN_PASSWORD", "").strip()
+    env_pw = normalize_password(os.environ.get("ADMIN_PASSWORD", ""))
     if env_pw:
         return {"password": env_pw}
     path = DATA / "admin.json"
     if path.exists():
-        return read_json(path)
+        return {"password": normalize_password(str(read_json(path).get("password") or ""))}
     return {"password": "DataNova1"}
+
+
+def normalize_password(raw: str) -> str:
+    value = str(raw or "").strip().strip('"').strip("'")
+    if value.startswith("ADMIN_PASSWORD") and "=" in value:
+        value = value.split("=", 1)[1].strip().strip('"').strip("'")
+    return value
+
+
+def passwords_match(given: str, expected: str) -> bool:
+    left = normalize_password(given).encode("utf-8")
+    right = normalize_password(expected).encode("utf-8")
+    if not right or len(left) != len(right):
+        return False
+    return secrets.compare_digest(left, right)
 
 
 def safe_file(root: Path, rel: str) -> Path | None:
@@ -191,7 +206,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             password = str(payload.get("password") or "")
             expected = str(load_admin().get("password") or "")
-            if not expected or not secrets.compare_digest(password, expected):
+            if not passwords_match(password, expected):
                 self._json(401, {"error": "password"})
                 return
             token = secrets.token_hex(24)

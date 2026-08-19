@@ -67,12 +67,13 @@ function render() {
       <main class="wrap admin-login">
         <p class="kicker">Удирдлага</p>
         <h1>DataNova</h1>
-        <p class="lede">Тайлан нэмэх, устгах, захиалга харах, данс засахаа эндээс хийнэ.</p>
+        <p class="lede">Энд <strong>ADMIN_PASSWORD</strong> гэж бичихгүй. Render дээрх тэр нэрийн <strong>утгыг</strong> хуулна.</p>
         <form id="login-form" class="buy-box" method="post" action="#">
-          <label>Нууц үг<input name="password" type="password" required autocomplete="current-password"></label>
+          <label>Нууц үг<input name="password" type="password" required autocomplete="current-password" spellcheck="false"></label>
           <p class="form-error">${escapeHtml(state.loginError)}</p>
-          <button class="btn wide" type="submit">Нэвтрэх</button>
+          <button class="btn wide" type="button" data-action="login">Нэвтрэх</button>
         </form>
+        <p class="muted" style="margin-top:16px">Render → datanova → Environment → ADMIN_PASSWORD → Value-г бүтнээр хуул. Эсвэл тэр утгыг өөрийн энгийн нууц үгээр соль.</p>
         <p class="muted" style="margin-top:16px"><a href="/">Дэлгүүр рүү</a></p>
       </main>
     `;
@@ -354,6 +355,18 @@ document.addEventListener("click", async (event) => {
     state.tab = tab.getAttribute("data-tab");
     state.notice = "";
     state.error = "";
+    render();
+    return;
+  }
+  if (event.target.closest("[data-action=login]")) {
+    const form = document.getElementById("login-form");
+    if (!form) return;
+    state.loginError = "";
+    try {
+      await login(new FormData(form).get("password"));
+    } catch {
+      state.loginError = "Нууц үг таарахгүй байна. ADMIN_PASSWORD гэж бичихгүй, Render дээрх Value-г хуулна уу.";
+    }
     render();
     return;
   }
