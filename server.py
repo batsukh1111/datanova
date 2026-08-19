@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import mimetypes
 import os
 import re
 import secrets
@@ -16,9 +17,9 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
-WEB = ROOT / "web"
-DATA = ROOT / "data"
-ORDERS = ROOT / "orders"
+WEB = (ROOT / "web").resolve()
+DATA = (ROOT / "data").resolve()
+ORDERS = (ROOT / "orders").resolve()
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8787"))
 
@@ -60,6 +61,17 @@ def load_admin() -> dict:
     return {"password": "DataNova1"}
 
 
+def safe_file(root: Path, rel: str) -> Path | None:
+    if not rel or rel.endswith("/"):
+        return None
+    target = (root / rel).resolve()
+    try:
+        target.relative_to(root)
+    except ValueError:
+        return None
+    return target if target.is_file() else None
+
+
 class Handler(SimpleHTTPRequestHandler):
     def log_message(self, fmt: str, *args) -> None:
         sys_stdout = __import__("sys").stderr
@@ -69,34 +81,9 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
 
-    def translate_path(self, path: str) -> str:
-        parsed = urlparse(path)
-        clean = parsed.path
-
-        if clean in ("/data/admin.json", "/data/admin"):
-            return str(DATA / "_denied")
-
-        if clean.startswith("/data/"):
-            rel = clean[len("/data/") :]
-            target = (DATA / rel).resolve()
-            if DATA in target.parents or target == DATA:
-                return str(target)
-            return str(DATA / "_denied")
-
-        if clean in ("", "/"):
-            return str(WEB / "index.html")
-
-        if clean in ("/admin", "/admin/"):
-            return str(WEB / "admin.html")
-
-        target = (WEB / clean.lstrip("/")).resolve()
-        if WEB in target.parents or target == WEB:
-            return str(target)
-        return str(WEB / "index.html")
-
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
-        path = parsed.path
+        path = parsed.path or "/"
         if path == "/api/health":
             self._json(200, {"ok": True})
             return
@@ -115,7 +102,71 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             self._json(200, load_catalog())
             return
-        super().do_GET()
+        self._serve_public(path)
+
+    def do_HEAD(self) -> None:
+        parsed = urlparse(self.path)
+        path = parsed.path or "/"
+        if path == "/api/health":
+            self._json(200, {"ok": True})
+            return
+        self._serve_public(path, body=False)
+
+    def _serve_public(self, path: str, body: bool = True) -> None:
+        if path in ("/", "/index.html"):
+            self._send_file(WEB / "index.html", body=body)
+            return
+        if path in ("/admin", "/admin/"):
+            self._send_file(WEB / "admin.html", body=body)
+            return
+        if path.startswith("/data/"):
+            if path.rstrip("/").endswith("admin.json") or path.rstrip("/").endswith("/admin"):
+                self._not_found()
+                return
+            target = safe_file(DATA, path[len("/data/") :])
+            if not target:
+                self._not_found()
+                return
+            self._send_file(target, body=body)
+            return
+        target = safe_file(WEB, path.lstrip("/"))
+        if target:
+            self._send_file(target, body=body)
+            return
+        self._send_file(WEB / "index.html", body=body)
+
+    def _send_file(self, path: Path, body: bool = True) -> None:
+        if not path.is_file():
+            self._not_found()
+            return
+        ctype = mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+        if path.suffix in {".html", ".js", ".css", ".json", ".svg", ".txt"}:
+            ctype = {
+                ".html": "text/html; charset=utf-8",
+                ".js": "text/javascript; charset=utf-8",
+                ".css": "text/css; charset=utf-8",
+                ".json": "application/json; charset=utf-8",
+                ".svg": "image/svg+xml",
+                ".txt": "text/plain; charset=utf-8",
+            }[path.suffix]
+        data = path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        if body:
+            self.wfile.write(data)
+
+    def _not_found(self) -> None:
+        body = (
+            "<!doctype html><meta charset=utf-8><title>Олдсонгүй</title>"
+            "<p>Хуудас олдсонгүй. <a href='/'>Нүүр</a></p>"
+        ).encode("utf-8")
+        self.send_response(404)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
