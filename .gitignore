@@ -1,0 +1,12 @@
+orders/*.json
+data/admin.json
+__pycache__/
+*.pyc
+_verify/
+_verify.py
+_verify_admin.py
+_debug_search.py
+_debug_api.py
+*.log
+.DS_Store
+
