@@ -59,7 +59,7 @@ function parseRoute() {
   const hash = location.hash.replace(/^#/, "") || "/";
   const parts = hash.split("/").filter(Boolean);
   if (parts[0] === "product" && parts[1]) return { name: "product", id: parts[1] };
-  if (parts[0] === "catalog") return { name: "catalog" };
+  if (parts[0] === "catalog") return { name: "catalog", filter: parts[1] || "all" };
   if (parts[0] === "cart") return { name: "cart" };
   if (parts[0] === "checkout") return { name: "checkout" };
   if (parts[0] === "order" && parts[1]) return { name: "order", id: parts[1] };
@@ -131,7 +131,8 @@ function layout(inner) {
           <button class="menu-btn" type="button" data-action="menu">${state.menuOpen ? t("close") : t("menu")}</button>
           <nav class="nav ${state.menuOpen ? "open" : ""}">
             <a href="#/" class="${route === "home" ? "active" : ""}">${t("home")}</a>
-            <a href="#/catalog" class="${route === "catalog" ? "active" : ""}">${t("shop")}</a>
+            <a href="#/catalog" class="${route === "catalog" && state.filter !== "pptx" ? "active" : ""}">${t("shop")}</a>
+            <a href="#/catalog/pptx" class="${state.filter === "pptx" && route === "catalog" ? "active" : ""}">${t("ppt")}</a>
             <a href="#/about" class="${route === "about" ? "active" : ""}">${t("about")}</a>
           </nav>
           <div class="lang-switch" role="group" aria-label="Language">
@@ -170,7 +171,7 @@ function viewHome() {
           <p class="lede">${escapeHtml(loc(state.store, "description"))}</p>
           <div class="hero-actions">
             <a class="btn" href="#/catalog">${t("shopCta")}</a>
-            <a class="btn ghost" href="#/about">${t("howCta")}</a>
+            <a class="btn ghost" href="#/catalog/pptx">${t("seePpt")}</a>
           </div>
         </div>
         <aside class="hero-aside">
@@ -190,8 +191,26 @@ function viewHome() {
         </div>
         <div class="grid">${featured.map(productCard).join("")}</div>
       </section>
+      ${templateSection()}
       ${audienceSection()}
     </div>
+  `;
+}
+
+function templateSection() {
+  const items = visibleProducts().filter((p) => p.category === "pptx");
+  if (!items.length) return "";
+  return `
+      <section class="section" id="ppt">
+        <div class="section-head">
+          <div>
+            <h2>${escapeHtml(loc(state.store, "pptTitle") || t("catalogTitlePpt"))}</h2>
+            <p class="hint">${escapeHtml(loc(state.store, "pptHint"))}</p>
+          </div>
+          <a href="#/catalog/pptx">${t("seeAll")}</a>
+        </div>
+        <div class="grid">${items.map(productCard).join("")}</div>
+      </section>
   `;
 }
 
@@ -261,7 +280,7 @@ function viewCatalog() {
   return `
     <div class="wrap">
       <p class="kicker">${t("catalogKicker")}</p>
-      <h1>${t("catalogTitle")}</h1>
+      <h1>${state.filter === "pptx" ? t("catalogTitlePpt") : t("catalogTitle")}</h1>
       <div class="toolbar">
         <input class="search" id="search" type="search" placeholder="${escapeAttr(t("searchPh"))}" value="${escapeAttr(state.query)}">
       </div>
@@ -324,7 +343,7 @@ function viewProduct(id) {
         <p class="muted">${escapeHtml(loc(p, "excerpt"))}</p>
         <div class="price-row">
           <span class="price">${money(p.price)}</span>
-          <span class="muted">${p.pages ? `${p.pages} ${t("pages")} · ` : ""}${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class="muted">${p.pages ? `${p.pages} ${p.category === "pptx" ? t("slides") : t("pages")} · ` : ""}${escapeHtml((p.formats || []).join(", "))}</span>
         </div>
         <p class="muted">${t("forWhom")}: ${escapeHtml(audience.join(", "))}</p>
         ${inCart
@@ -568,6 +587,7 @@ document.addEventListener("submit", (event) => {
 
 window.addEventListener("hashchange", () => {
   state.route = parseRoute();
+  if (state.route.name === "catalog") state.filter = state.route.filter || "all";
   state.menuOpen = false;
   state.formError = "";
   window.scrollTo(0, 0);
@@ -581,6 +601,7 @@ async function boot() {
   ]);
   state.store = await storeRes.json();
   state.catalog = await catalogRes.json();
+  if (state.route.name === "catalog") state.filter = state.route.filter || "all";
   state.cart = state.cart.filter((id) => productById(id));
   saveCart();
   render();

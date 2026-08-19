@@ -14,6 +14,10 @@
   "heroAsideEn": "Sample products for now. Replace them with your own data.",
   "featuredHint": "Онцлох тайлан, өгөгдөл.",
   "featuredHintEn": "Featured reports and datasets.",
+  "pptTitle": "PPT загвар",
+  "pptTitleEn": "PowerPoint templates",
+  "pptHint": "Тайлан, тоймоо слайдад оруулахад бэлэн загвар. Өөрийн тоо, логоо тавина.",
+  "pptHintEn": "Ready decks for reports and briefings. Add your numbers and logo.",
   "audienceTitle": "Хэнд зориулсан бэ",
   "audienceTitleEn": "Who it is for",
   "audience": [

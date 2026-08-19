@@ -6,6 +6,7 @@ const CATEGORIES = [
   { id: "report", label: "Тайлан" },
   { id: "dataset", label: "Өгөгдөл" },
   { id: "guide", label: "Заавар" },
+  { id: "pptx", label: "PPT загвар" },
 ];
 
 const STATUS_LABEL = {
@@ -236,6 +237,10 @@ function viewStore() {
       <label>Aside EN<textarea name="heroAsideEn" rows="2">${escapeHtml(s.heroAsideEn || "")}</textarea></label>
       <label>Онцлох тайлбар MN<input name="featuredHint" value="${escapeAttr(s.featuredHint || "")}"></label>
       <label>Featured hint EN<input name="featuredHintEn" value="${escapeAttr(s.featuredHintEn || "")}"></label>
+      <label>PPT хэсгийн гарчиг MN<input name="pptTitle" value="${escapeAttr(s.pptTitle || "PPT загвар")}"></label>
+      <label>PPT section title EN<input name="pptTitleEn" value="${escapeAttr(s.pptTitleEn || "")}"></label>
+      <label>PPT хэсгийн тайлбар MN<textarea name="pptHint" rows="2">${escapeHtml(s.pptHint || "")}</textarea></label>
+      <label>PPT section hint EN<textarea name="pptHintEn" rows="2">${escapeHtml(s.pptHintEn || "")}</textarea></label>
       <label>Доод мэдэгдэл MN<textarea name="notice" rows="2">${escapeHtml(s.notice || "")}</textarea></label>
       <label>Footer notice EN<textarea name="noticeEn" rows="2">${escapeHtml(s.noticeEn || "")}</textarea></label>
       <h2>Хэнд зориулсан бэ</h2>
@@ -377,6 +382,10 @@ async function saveStoreForm(form) {
         heroAsideEn: data.get("heroAsideEn"),
         featuredHint: data.get("featuredHint"),
         featuredHintEn: data.get("featuredHintEn"),
+        pptTitle: data.get("pptTitle"),
+        pptTitleEn: data.get("pptTitleEn"),
+        pptHint: data.get("pptHint"),
+        pptHintEn: data.get("pptHintEn"),
         notice: data.get("notice"),
         noticeEn: data.get("noticeEn"),
         audienceTitle: data.get("audienceTitle"),

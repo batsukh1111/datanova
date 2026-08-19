@@ -33,6 +33,7 @@ CATEGORY_LABELS = {
     "report": "Тайлан",
     "dataset": "Өгөгдөл",
     "guide": "Заавар",
+    "pptx": "PPT загвар",
 }
 ORDER_STATUSES = {"awaiting_payment", "paid", "sent", "cancelled"}
 
@@ -397,6 +398,10 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
             "heroAsideEn": pick_text(payload, current, "heroAsideEn", 300),
             "featuredHint": pick_text(payload, current, "featuredHint", 200),
             "featuredHintEn": pick_text(payload, current, "featuredHintEn", 200),
+            "pptTitle": pick_text(payload, current, "pptTitle", 80),
+            "pptTitleEn": pick_text(payload, current, "pptTitleEn", 80),
+            "pptHint": pick_text(payload, current, "pptHint", 240),
+            "pptHintEn": pick_text(payload, current, "pptHintEn", 240),
             "notice": pick_text(payload, current, "notice", 300),
             "noticeEn": pick_text(payload, current, "noticeEn", 300),
             "audienceTitle": pick_text(payload, current, "audienceTitle", 80),
