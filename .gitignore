@@ -10,4 +10,6 @@ _debug_api.py
 *.log
 .DS_Store
 cloudflared.exe
+web/uploads/*
+!web/uploads/.gitkeep
 

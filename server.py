@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parent
 WEB = (ROOT / "web").resolve()
 DATA = (ROOT / "data").resolve()
 ORDERS = (ROOT / "orders").resolve()
+UPLOADS = (WEB / "uploads").resolve()
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8787"))
 
@@ -223,6 +224,19 @@ class Handler(SimpleHTTPRequestHandler):
             ORDERS.mkdir(exist_ok=True)
             write_json(ORDERS / f"{order['id']}.json", order)
             self._json(201, {"order": public_order(order)})
+            return
+        if path == "/api/admin/upload":
+            if not self._admin_ok():
+                return
+            payload, err = self._read_json(2_200_000)
+            if err:
+                self._json(400, {"error": err})
+                return
+            saved, save_err = save_upload(payload)
+            if save_err:
+                self._json(400, {"error": save_err})
+                return
+            self._json(201, saved)
             return
         if path == "/api/admin/login":
             payload, err = self._read_json(4_000)
@@ -526,6 +540,7 @@ def save_product(payload: dict) -> tuple[dict | None, str | None]:
             "includesEn": lines(payload.get("includesEn"), existing.get("includesEn") or []),
             "notIncludesEn": lines(payload.get("notIncludesEn"), existing.get("notIncludesEn") or []),
             "audienceEn": lines(payload.get("audienceEn"), existing.get("audienceEn") or []),
+            "images": clean_images(payload.get("images"), existing.get("images") or []),
         }
     )
     if payload.get("toc") is not None:
@@ -602,6 +617,42 @@ def delete_product(pid: str) -> tuple[bool, str | None]:
     catalog["products"] = kept
     write_json(DATA / "products.json", catalog)
     return True, None
+
+
+def clean_images(raw, fallback: list) -> list[str]:
+    source = raw if isinstance(raw, list) else fallback
+    out = []
+    for item in source[:3]:
+        url = str(item or "").strip()
+        if url.startswith(("https://", "http://", "/uploads/")):
+            out.append(url[:500])
+    return out
+
+
+def save_upload(payload: dict) -> tuple[dict | None, str | None]:
+    import base64
+
+    raw = str(payload.get("data") or "")
+    if not raw.startswith("data:image/") or "," not in raw:
+        return None, "type"
+    header, blob = raw.split(",", 1)
+    ext = "jpg"
+    if "png" in header:
+        ext = "png"
+    elif "webp" in header:
+        ext = "webp"
+    elif "gif" in header:
+        ext = "gif"
+    try:
+        data = base64.b64decode(blob)
+    except Exception:
+        return None, "type"
+    if not data or len(data) > 1_600_000:
+        return None, "too_big"
+    UPLOADS.mkdir(parents=True, exist_ok=True)
+    name = f"{uuid.uuid4().hex[:12]}.{ext}"
+    (UPLOADS / name).write_bytes(data)
+    return {"url": f"/uploads/{name}"}, None
 
 
 def next_sku(products: list[dict]) -> str:

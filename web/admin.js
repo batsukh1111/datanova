@@ -204,6 +204,24 @@ function productForm(p) {
       <label>Contents (EN)<textarea name="tocEn" rows="3">${escapeHtml(lines(p.tocEn))}</textarea></label>
       <label>Урьдчилсан уншлага (MN)<textarea name="preview" rows="3">${escapeHtml(lines(p.preview))}</textarea></label>
       <label>Preview (EN)<textarea name="previewEn" rows="3">${escapeHtml(lines(p.previewEn))}</textarea></label>
+      <h3>Жишээ зураг (2–3)</h3>
+      <p class="muted">Худалдан авагч юу авч байгаагаа харна. Файл хуулах эсвэл зургийн холбоос тавина.</p>
+      <div class="img-slots">
+        ${[0, 1, 2].map((index) => {
+          const src = (p.images || [])[index];
+          return `
+            <div class="img-slot">
+              ${src
+                ? `<img src="${escapeAttr(src)}" alt=""><button type="button" class="linkish" data-img-remove="${index}">Хасах</button>`
+                : `<span class="muted">${index + 1}-р зураг</span>`}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="split">
+        <label>Файл хуулах<input id="img-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+        <label>Эсвэл холбоос<input id="img-url" type="url" placeholder="https://..."></label>
+      </div>
+      <button class="btn ghost" type="button" data-action="add-img-url">Холбоос нэмэх</button>
       <label class="check"><input type="checkbox" name="featured" ${p.featured ? "checked" : ""}><span>Нүүр хуудсанд онцлох</span></label>
       <label class="check"><input type="checkbox" name="published" ${p.published !== false ? "checked" : ""}><span>Дэлгүүрт харагдуулах</span></label>
       <div class="admin-actions">
@@ -360,7 +378,52 @@ function saveErrorMessage(err) {
   if (code === "title") return "Тайлангийн нэрийг бичнэ үү.";
   if (code === "price") return "Үнээ зөв бичнэ үү.";
   if (code === "write_failed") return "Файл хадгалахад алдаа гарлаа.";
+  if (code === "too_big") return "Зураг хэт том байна. 1.5MB-аас бага байх ёстой.";
+  if (code === "type") return "Зөвхөн зураг (JPG, PNG, WEBP) оруулна.";
   return "Хадгалж чадсангүй. Дахин оролдоно уу.";
+}
+
+function mergeProductDraft() {
+  const form = document.getElementById("product-form");
+  if (!form) return;
+  if (!state.editing) state.editing = { images: [] };
+  const data = new FormData(form);
+  ["title", "titleEn", "subtitle", "subtitleEn", "category", "excerpt", "excerptEn", "description", "descriptionEn", "includes", "includesEn", "notIncludes", "notIncludesEn", "audience", "audienceEn", "toc", "tocEn", "preview", "previewEn", "formats"].forEach((key) => {
+    if (data.has(key)) state.editing[key] = data.get(key);
+  });
+  state.editing.price = data.get("price");
+  state.editing.pages = data.get("pages");
+  state.editing.featured = data.get("featured") === "on";
+  state.editing.published = data.get("published") === "on";
+  state.editing.images = state.editing.images || [];
+}
+
+async function uploadProductImage(file) {
+  if (!file) return;
+  if ((state.editing?.images || []).length >= 3) {
+    state.error = "3-аас илүү зураг нэмэхгүй.";
+    render();
+    return;
+  }
+  mergeProductDraft();
+  const data = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  try {
+    const saved = await api("/api/admin/upload", {
+      method: "POST",
+      body: JSON.stringify({ data }),
+    });
+    state.editing.images = [...(state.editing.images || []), saved.url].slice(0, 3);
+    state.error = "";
+    state.notice = "Зураг нэмэгдлээ. Доор Хадгалах дарж баталгаажуулна.";
+  } catch (err) {
+    state.error = saveErrorMessage(err);
+  }
+  render();
 }
 
 async function saveStoreForm(form) {
@@ -447,6 +510,7 @@ async function saveProductForm(form) {
         tocEn: data.get("tocEn"),
         preview: data.get("preview"),
         previewEn: data.get("previewEn"),
+        images: state.editing?.images || [],
         featured: data.get("featured") === "on",
         published: data.get("published") === "on",
       }),
@@ -560,7 +624,35 @@ document.addEventListener("click", async (event) => {
     return;
   }
   if (event.target.closest("[data-action=new-product]")) {
-    state.editing = { published: true, featured: false, formats: ["PDF"], category: "report" };
+    state.editing = { published: true, featured: false, formats: ["PDF"], category: "report", images: [] };
+    render();
+    return;
+  }
+  if (event.target.closest("[data-action=add-img-url]")) {
+    const input = document.getElementById("img-url");
+    const url = (input?.value || "").trim();
+    if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/uploads/")) {
+      state.error = "Зургийн холбоос https://-ээр эхлэх ёстой.";
+      render();
+      return;
+    }
+    mergeProductDraft();
+    if ((state.editing.images || []).length >= 3) {
+      state.error = "3-аас илүү зураг нэмэхгүй.";
+      render();
+      return;
+    }
+    state.editing.images = [...(state.editing.images || []), url].slice(0, 3);
+    if (input) input.value = "";
+    state.error = "";
+    render();
+    return;
+  }
+  const imgRemove = event.target.closest("[data-img-remove]");
+  if (imgRemove) {
+    mergeProductDraft();
+    const index = Number(imgRemove.getAttribute("data-img-remove"));
+    state.editing.images = (state.editing.images || []).filter((_, i) => i !== index);
     render();
     return;
   }
@@ -581,7 +673,8 @@ document.addEventListener("click", async (event) => {
   }
   const edit = event.target.closest("[data-edit]");
   if (edit) {
-    state.editing = state.products.find((p) => p.id === edit.getAttribute("data-edit")) || null;
+    const found = state.products.find((p) => p.id === edit.getAttribute("data-edit"));
+    state.editing = found ? { ...found, images: [...(found.images || [])] } : null;
     render();
     window.scrollTo(0, 0);
     return;
@@ -612,6 +705,13 @@ document.addEventListener("click", async (event) => {
     }
     render();
   }
+});
+
+document.addEventListener("change", async (event) => {
+  if (event.target.id !== "img-file") return;
+  const file = event.target.files && event.target.files[0];
+  event.target.value = "";
+  if (file) await uploadProductImage(file);
 });
 
 async function boot() {

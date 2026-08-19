@@ -227,12 +227,18 @@ function audienceSection() {
   `;
 }
 
+function productImages(p) {
+  return (p.images || []).filter(Boolean).slice(0, 3);
+}
+
 function productCard(p) {
   const label = catLabel(p.category, loc(p, "categoryLabel") || p.categoryLabel);
+  const photo = productImages(p)[0];
   return `
     <a class="card product" href="#/product/${p.id}">
-      <div class="cover" style="${coverStyle(p)}">
-        <div class="cover-inner">
+      <div class="cover" style="${photo ? "" : coverStyle(p)}">
+        ${photo ? `<img class="cover-photo" src="${escapeAttr(photo)}" alt="">` : ""}
+        <div class="cover-inner ${photo ? "on-photo" : ""}">
           <span class="cover-sku">${escapeHtml(p.sku)}</span>
           <span>${escapeHtml(label)}</span>
         </div>
@@ -301,9 +307,15 @@ function viewProduct(id) {
   const toc = loc(p, "toc") || [];
   const audience = loc(p, "audience") || [];
   const hours = loc(state.store, "fulfillmentHours");
+  const shots = productImages(p);
   return `
     <div class="wrap detail">
       <div>
+        ${shots.length ? `
+        <div class="gallery">
+          <img id="shot-main" class="gallery-main" src="${escapeAttr(shots[0])}" alt="${escapeAttr(loc(p, "title"))}">
+          ${shots.length > 1 ? `<div class="gallery-thumbs">${shots.map((src, i) => `<button type="button" data-shot="${escapeAttr(src)}" class="${i === 0 ? "on" : ""}"><img src="${escapeAttr(src)}" alt=""></button>`).join("")}</div>` : ""}
+        </div>` : `
         <div class="detail-cover" style="${coverStyle(p)}">
           <div class="cover-inner">
             <span class="cover-sku">${escapeHtml(p.sku)} · ${escapeHtml(p.updated)}</span>
@@ -312,7 +324,7 @@ function viewProduct(id) {
               <strong style="font-family:var(--serif);font-size:28px">${escapeHtml(loc(p, "subtitle"))}</strong>
             </div>
           </div>
-        </div>
+        </div>`}
         <div class="preview-box" style="margin-top:14px">
           <h2>${t("what")}</h2>
           <p>${escapeHtml(loc(p, "description"))}</p>
@@ -569,6 +581,16 @@ document.addEventListener("click", (event) => {
   if (chip) {
     state.filter = chip.getAttribute("data-filter");
     render();
+    return;
+  }
+  const shot = event.target.closest("[data-shot]");
+  if (shot) {
+    const src = shot.getAttribute("data-shot");
+    const main = document.getElementById("shot-main");
+    if (main && src) main.src = src;
+    document.querySelectorAll(".gallery-thumbs button").forEach((btn) => {
+      btn.classList.toggle("on", btn === shot);
+    });
   }
 });
 
