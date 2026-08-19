@@ -1,211 +1,135 @@
 {
   "categories": [
-    {
-      "id": "all",
-      "label": "Бүгд"
-    },
-    {
-      "id": "briefing",
-      "label": "Тойм"
-    },
-    {
-      "id": "report",
-      "label": "Тайлан"
-    },
-    {
-      "id": "dataset",
-      "label": "Өгөгдөл"
-    },
-    {
-      "id": "guide",
-      "label": "Заавар"
-    }
+    { "id": "all", "label": "Бүгд", "labelEn": "All" },
+    { "id": "briefing", "label": "Тойм", "labelEn": "Briefing" },
+    { "id": "report", "label": "Тайлан", "labelEn": "Report" },
+    { "id": "dataset", "label": "Өгөгдөл", "labelEn": "Dataset" },
+    { "id": "guide", "label": "Заавар", "labelEn": "Guide" }
   ],
   "products": [
     {
       "id": "weekly-food-brief",
       "sku": "DNV-001",
       "title": "Хүнсний үнийн 7 хоногийн тойм",
+      "titleEn": "Weekly food price briefing",
       "subtitle": "Улаанбаатар, гол нэрийн бараа",
+      "subtitleEn": "Ulaanbaatar, staple goods",
       "category": "briefing",
       "categoryLabel": "Тойм",
       "price": 49000,
       "pages": 12,
-      "formats": [
-        "PDF",
-        "Excel"
-      ],
+      "formats": ["PDF", "Excel"],
       "updated": "2026-08",
       "featured": true,
       "sample": true,
       "accent": "#b44a2a",
-      "audience": [
-        "Сэтгүүлч",
-        "Худалдаа",
-        "Судлаач"
-      ],
+      "audience": ["Сэтгүүлч", "Худалдаа", "Судлаач"],
+      "audienceEn": ["Journalists", "Retail", "Researchers"],
       "excerpt": "Энэ 7 хоногт мах, гурил, сүү, шатахуун аль чиглэлд хөдөлсөн, юу нь үнэнд нөлөөлснийг нэг дор уншина.",
-      "description": "Нийтийн эх сурвалжаас авсан тоог цэвэрлэж, харьцуулалт, богино дүгнэлттэй тойм болгосон. Албан ёсны статистикийн хэвлэл биш. Сэтгүүлч, худалдааны менежер, судлаач нэг хуудсанд юу болсныг харах зориулалттай.",
-      "includes": [
-        "12 хуудас PDF тойм",
-        "Гол нэрийн барааны Excel хүснэгт",
-        "Өмнөх 7 хоног, сар, жилийн харьцуулалт",
-        "3 гол дүгнэлт, 1 эрсдэлийн тэмдэглэл"
-      ],
-      "notIncludes": [
-        "Албан ёсны статистикийн тамга, дугаар",
-        "Бүх барааны түүхий жагсаалт",
-        "Курсийн ажил болгон өгөх эцсийн текст"
-      ],
-      "toc": [
-        "Энэ 7 хоногийн зураг",
-        "Мах, гурил, сүү, хүнсний тос",
-        "Шатахуун ба тээврийн нөлөө",
-        "Юуг дараагийн 7 хоногт ажиглах вэ"
-      ],
-      "preview": [
-        "Махны дундаж үнэ энэ 7 хоногт өмнөхөөс бага зэрэг буурсан ч жилийн дүнгээр өндөр хэвээр байна. Гурилын үнэ тогтвортой, сүүний үнэ улирлын хэв маягаа дагаж байна.",
-        "Доорх хэсэг бүрэн тайланд: бараа бүрийн хүснэгт, эх сурвалжийн тэмдэглэл, богино арга зүй."
-      ]
+      "excerptEn": "See where meat, flour, milk, and fuel moved this week, and what drove the prices.",
+      "description": "Нийтийн эх сурвалжаас авсан тоог цэвэрлэж, харьцуулалт, богино дүгнэлттэй тойм болгосон. Албан ёсны статистикийн хэвлэл биш.",
+      "descriptionEn": "Public figures, cleaned and turned into a short comparison with findings. Not an official statistical release.",
+      "includes": ["12 хуудас PDF тойм", "Гол нэрийн барааны Excel хүснэгт", "Өмнөх 7 хоног, сар, жилийн харьцуулалт", "3 гол дүгнэлт, 1 эрсдэлийн тэмдэглэл"],
+      "includesEn": ["12-page PDF briefing", "Excel table of staples", "Week, month, and year comparisons", "3 findings and 1 risk note"],
+      "notIncludes": ["Албан ёсны статистикийн тамга, дугаар", "Бүх барааны түүхий жагсаалт", "Курсийн ажил болгон өгөх эцсийн текст"],
+      "notIncludesEn": ["Official stamps or publication numbers", "A raw list of every item", "A finished student paper"],
+      "toc": ["Энэ 7 хоногийн зураг", "Мах, гурил, сүү, хүнсний тос", "Шатахуун ба тээврийн нөлөө", "Юуг дараагийн 7 хоногт ажиглах вэ"],
+      "tocEn": ["This week at a glance", "Meat, flour, milk, cooking oil", "Fuel and transport", "What to watch next week"],
+      "preview": ["Махны дундаж үнэ энэ 7 хоногт өмнөхөөс бага зэрэг буурсан ч жилийн дүнгээр өндөр хэвээр байна.", "Доорх хэсэг бүрэн тайланд: бараа бүрийн хүснэгт, эх сурвалжийн тэмдэглэл, богино арга зүй."],
+      "previewEn": ["Average meat prices eased a little this week but remain high on a yearly basis.", "The full briefing has item tables, source notes, and a short method."]
     },
     {
       "id": "inflation-basket-note",
       "sku": "DNV-002",
       "title": "Инфляцын задлал: өрхийн сагсанд юу нөлөөлөв",
+      "titleEn": "Inflation breakdown: what hit the household basket",
       "subtitle": "Сүүлийн 12 сарын уншлага",
+      "subtitleEn": "A 12-month reading",
       "category": "report",
       "categoryLabel": "Тайлан",
       "price": 89000,
       "pages": 28,
-      "formats": [
-        "PDF"
-      ],
+      "formats": ["PDF"],
       "updated": "2026-08",
       "featured": true,
       "sample": true,
       "accent": "#2f4a3c",
-      "audience": [
-        "Бодлого",
-        "Банк, санхүү",
-        "Судлаач"
-      ],
+      "audience": ["Бодлого", "Банк, санхүү", "Судлаач"],
+      "audienceEn": ["Policy", "Banking and finance", "Researchers"],
       "excerpt": "Инфляц нэг тоо биш. Хүнс, орон сууц, тээвэр аль нь өрхийн төсөвт илүү дарж байгааг задлаад харуулна.",
-      "description": "Нийтийн үзүүлэлтийг бүлгээр нь задлаж, өрхийн хэрэглээний сагсанд аль бүлэг илүү нөлөөлснийг тайлбарласан судалгааны тэмдэглэл. Тоо өөрөө биш, уншихад ойлгомжтой дүгнэлт гол бүтээгдэхүүн.",
-      "includes": [
-        "28 хуудас судалгааны тэмдэглэл",
-        "Бүлгүүдийн нөлөөний зураглал",
-        "Арга зүйн богино хавсралт",
-        "Ашигласан нийтийн эх сурвалжийн жагсаалт"
-      ],
-      "notIncludes": [
-        "Албан ёсны индекс, тамгатай хүснэгт",
-        "Нууц эсвэл дотоод өгөгдөл",
-        "Оюутны нэр дээр өгөх бэлэн курсийн ажил"
-      ],
-      "toc": [
-        "Нэг тооны цаад бүтэц",
-        "Хүнс яагаад давамгайлдаг вэ",
-        "Орон сууц, хатуу түлш, тээвэр",
-        "Юуг андуурч уншдаг вэ",
-        "Арга зүй ба хязгаарлалт"
-      ],
-      "preview": [
-        "Инфляцыг нэг хувиар хэлэхэд хялбар. Гэхдээ өрх мах, түрээс, түлшэнд өөр өөрөөр өртдөг. Энэ тэмдэглэл тэр ялгааг уншигчид ойлгомжтой болгоно.",
-        "Бүрэн хувилбарт бүлэг бүрийн нөлөө, зураг, уншлагын анхааруулга орно."
-      ]
+      "excerptEn": "Inflation is not one number. See whether food, housing, or transport pressed the household budget more.",
+      "description": "Нийтийн үзүүлэлтийг бүлгээр нь задлаж, өрхийн хэрэглээний сагсанд аль бүлэг илүү нөлөөлснийг тайлбарласан судалгааны тэмдэглэл.",
+      "descriptionEn": "A research note that splits public figures by group and explains which ones moved the household basket.",
+      "includes": ["28 хуудас судалгааны тэмдэглэл", "Бүлгүүдийн нөлөөний зураглал", "Арга зүйн богино хавсралт", "Ашигласан нийтийн эх сурвалжийн жагсаалт"],
+      "includesEn": ["28-page research note", "Group contribution charts", "Short method annex", "List of public sources"],
+      "notIncludes": ["Албан ёсны индекс, тамгатай хүснэгт", "Нууц эсвэл дотоод өгөгдөл", "Оюутны нэр дээр өгөх бэлэн курсийн ажил"],
+      "notIncludesEn": ["Official stamped index tables", "Confidential or internal data", "A finished student paper"],
+      "toc": ["Нэг тооны цаад бүтэц", "Хүнс яагаад давамгайлдаг вэ", "Орон сууц, хатуу түлш, тээвэр", "Юуг андуурч уншдаг вэ", "Арга зүй ба хязгаарлалт"],
+      "tocEn": ["What sits behind one number", "Why food often dominates", "Housing, solid fuel, transport", "Common misreadings", "Method and limits"],
+      "preview": ["Инфляцыг нэг хувиар хэлэхэд хялбар. Гэхдээ өрх мах, түрээс, түлшэнд өөр өөрөөр өртдөг.", "Бүрэн хувилбарт бүлэг бүрийн нөлөө, зураг, уншлагын анхааруулга орно."],
+      "previewEn": ["It is easy to quote one inflation rate. Households feel meat, rent, and fuel differently.", "The full note has group contributions, figures, and reading caveats."]
     },
     {
       "id": "monthly-price-panel",
       "sku": "DNV-003",
       "title": "Цэвэр үнийн хүснэгт — сар, 5 жил",
+      "titleEn": "Clean monthly price panel — 5 years",
       "subtitle": "Гол нэрийн бараа, бэлэн панел",
+      "subtitleEn": "Staples, ready to use",
       "category": "dataset",
       "categoryLabel": "Өгөгдөл",
       "price": 120000,
       "pages": 0,
-      "formats": [
-        "Excel",
-        "CSV",
-        "codebook"
-      ],
+      "formats": ["Excel", "CSV", "codebook"],
       "updated": "2026-08",
       "featured": true,
       "sample": true,
       "accent": "#1e3a5f",
-      "audience": [
-        "Судлаач",
-        "Шинжээч",
-        "Багш"
-      ],
+      "audience": ["Судлаач", "Шинжээч", "Багш"],
+      "audienceEn": ["Researchers", "Analysts", "Teachers"],
       "excerpt": "Олон газраас цуглуулсан үнийг нэг хүснэгт, нэг нэршил, нэг нэгжээр нь цэвэрлэсэн. Шууд график, загвар хийхэд бэлэн.",
-      "description": "Түүхий нийтийн тоог хуулбарлаагүй. Нэршил, нэгж, дутуу утга, эх сурвалжийг нэг мөрөнд багтаасан цэвэр панел. Өөрөө шинжилгээ хийх хүн цаг хэмнэнэ.",
-      "includes": [
-        "Excel болон CSV файл",
-        "Хувьсагчийн тайлбар (codebook)",
-        "Нэгж, нэршил, эх сурвалжийн багана",
-        "Дутуу утгын тэмдэглэл"
-      ],
-      "notIncludes": [
-        "Албан ёсны микродата",
-        "Хувь хүний мэдээлэл",
-        "Автоматаар шинэчлэгддэг API"
-      ],
-      "toc": [
-        "Файлын бүтэц",
-        "Барааны нэршил, нэгж",
-        "Цаг хугацааны хамрах хүрээ",
-        "Юуг хэрхэн иш татах вэ"
-      ],
-      "preview": [
-        "Мөр бүр: огноо, бараа, нэгж, үнэ, газар, эх сурвалж. Нэршил нэг мөрөнд нэг утгатай. Дутуу сарыг хоосон биш, тусдаа тэмдэглэсэн.",
-        "Codebook-д багана бүрийн тайлбар, жишээ мөр бий."
-      ]
+      "excerptEn": "Prices from several sources, cleaned to one table, one name, one unit. Ready for charts and models.",
+      "description": "Түүхий нийтийн тоог хуулбарлаагүй. Нэршил, нэгж, дутуу утга, эх сурвалжийг нэг мөрөнд багтаасан цэвэр панел.",
+      "descriptionEn": "Not a raw dump. Names, units, missing values, and sources sit in one clean panel.",
+      "includes": ["Excel болон CSV файл", "Хувьсагчийн тайлбар (codebook)", "Нэгж, нэршил, эх сурвалжийн багана", "Дутуу утгын тэмдэглэл"],
+      "includesEn": ["Excel and CSV files", "Variable codebook", "Unit, name, and source columns", "Missing-value notes"],
+      "notIncludes": ["Албан ёсны микродата", "Хувь хүний мэдээлэл", "Автоматаар шинэчлэгддэг API"],
+      "notIncludesEn": ["Official microdata", "Personal data", "A live auto-updating API"],
+      "toc": ["Файлын бүтэц", "Барааны нэршил, нэгж", "Цаг хугацааны хамрах хүрээ", "Юуг хэрхэн иш татах вэ"],
+      "tocEn": ["File layout", "Item names and units", "Time coverage", "How to cite"],
+      "preview": ["Мөр бүр: огноо, бараа, нэгж, үнэ, газар, эх сурвалж.", "Codebook-д багана бүрийн тайлбар, жишээ мөр бий."],
+      "previewEn": ["Each row: date, item, unit, price, place, source.", "The codebook explains every column and gives a sample row."]
     },
     {
       "id": "report-writing-kit",
       "sku": "DNV-004",
       "title": "Судалгааны тайлан бичих хэрэгсэл",
+      "titleEn": "Research report writing kit",
       "subtitle": "Бүтэц, ишлэл, шалгах хуудас",
+      "subtitleEn": "Structure, citation, checklist",
       "category": "guide",
       "categoryLabel": "Заавар",
       "price": 19000,
       "pages": 18,
-      "formats": [
-        "PDF",
-        "DOCX загвар"
-      ],
+      "formats": ["PDF", "DOCX загвар"],
       "updated": "2026-08",
       "featured": false,
       "sample": true,
       "accent": "#6b4f2a",
-      "audience": [
-        "Оюутан",
-        "Багш",
-        "Шинэ судлаач"
-      ],
+      "audience": ["Оюутан", "Багш", "Шинэ судлаач"],
+      "audienceEn": ["Students", "Teachers", "New researchers"],
       "excerpt": "Тайлангаа өөрөө бичихэд хэрэгтэй бүтэц, ишлэлийн жишээ, шалгах хуудас. Бэлэн курсийн ажил биш.",
-      "description": "Оюутан, шинэ судлаач өөрийн сэдвээр тайлан бичихэд зориулсан заавар. Энд бэлэн хариу, бэлэн бие даалт байхгүй. Хуулж өгвөл зохиогчийн эрх болон сургуулийн дүрэм зөрчинө.",
-      "includes": [
-        "Тайлангийн бүтэц (оршилоос дүгнэлт)",
-        "Иш татах жишээ, хориглох жишээ",
-        "Word загвар (нүүр, агуулга, хүснэгт)",
-        "Өөрийн ажлыг шалгах 20 цэг"
-      ],
-      "notIncludes": [
-        "Тодорхой хичээлийн бэлэн хариу",
-        "Нэр солиод өгчихдөг текст",
-        "Багшид өгөх эцсийн тайлан"
-      ],
-      "toc": [
-        "Сэдэвээ хэрхэн нарийсгах вэ",
-        "Асуулт, арга, нотолгоо",
-        "Ишлэл ба эх сурвалж",
-        "Шалгах хуудас"
-      ],
-      "preview": [
-        "Сайн тайлан бэлэн текст хуулахаас биш, асуулт, нотолгоо, дүгнэлтээс бүрдэнэ. Энэ хэрэгсэл тэр дарааллыг гаргаж өгнө.",
-        "Загвар дээр нэр, сэдэв, хүснэгтээ өөрөө бөглөнө."
-      ]
+      "excerptEn": "Structure, citation examples, and a checklist to write your own report. Not a finished assignment.",
+      "description": "Оюутан, шинэ судлаач өөрийн сэдвээр тайлан бичихэд зориулсан заавар. Энд бэлэн хариу байхгүй.",
+      "descriptionEn": "A guide for students and new researchers writing their own topic. There are no ready-made answers here.",
+      "includes": ["Тайлангийн бүтэц (оршилоос дүгнэлт)", "Иш татах жишээ, хориглох жишээ", "Word загвар", "Өөрийн ажлыг шалгах 20 цэг"],
+      "includesEn": ["Report structure from intro to conclusion", "Citation do’s and don’ts", "Word template", "20-point self-check"],
+      "notIncludes": ["Тодорхой хичээлийн бэлэн хариу", "Нэр солиод өгчихдөг текст", "Багшид өгөх эцсийн тайлан"],
+      "notIncludesEn": ["Ready answers for a specific course", "Text you can rename and submit", "A finished paper for a teacher"],
+      "toc": ["Сэдэвээ хэрхэн нарийсгах вэ", "Асуулт, арга, нотолгоо", "Ишлэл ба эх сурвалж", "Шалгах хуудас"],
+      "tocEn": ["How to narrow a topic", "Question, method, evidence", "Citation and sources", "Checklist"],
+      "preview": ["Сайн тайлан бэлэн текст хуулахаас биш, асуулт, нотолгоо, дүгнэлтээс бүрдэнэ.", "Загвар дээр нэр, сэдэв, хүснэгтээ өөрөө бөглөнө."],
+      "previewEn": ["A good report is built from a question, evidence, and a conclusion — not copied text.", "You fill in your own name, topic, and tables."]
     }
   ]
 }

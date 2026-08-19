@@ -173,8 +173,10 @@ function productForm(p) {
     <form id="product-form" class="buy-box" style="margin-bottom:18px" method="post" action="#">
       <input type="hidden" name="id" value="${escapeAttr(p.id || "")}">
       <h2>${p.id ? "Тайлан засах" : "Шинэ тайлан"}</h2>
-      <label>Нэр<input name="title" required value="${escapeAttr(p.title || "")}"></label>
-      <label>Дэд гарчиг<input name="subtitle" value="${escapeAttr(p.subtitle || "")}"></label>
+      <label>Нэр (MN)<input name="title" required value="${escapeAttr(p.title || "")}"></label>
+      <label>Name (EN)<input name="titleEn" value="${escapeAttr(p.titleEn || "")}"></label>
+      <label>Дэд гарчиг (MN)<input name="subtitle" value="${escapeAttr(p.subtitle || "")}"></label>
+      <label>Subtitle (EN)<input name="subtitleEn" value="${escapeAttr(p.subtitleEn || "")}"></label>
       <div class="split">
         <label>Төрөл
           <select name="category">${CATEGORIES.map((c) => `<option value="${c.id}" ${p.category === c.id ? "selected" : ""}>${c.label}</option>`).join("")}</select>
@@ -185,13 +187,20 @@ function productForm(p) {
         <label>Хуудас<input name="pages" type="number" min="0" value="${escapeAttr(p.pages ?? 0)}"></label>
         <label>Формат<input name="formats" value="${escapeAttr((p.formats || []).join(", "))}" placeholder="PDF, Excel"></label>
       </div>
-      <label>Товч<input name="excerpt" value="${escapeAttr(p.excerpt || "")}"></label>
-      <label>Тайлбар<textarea name="description" rows="4">${escapeHtml(p.description || "")}</textarea></label>
-      <label>Багтана (мөр бүр нэг)<textarea name="includes" rows="4">${escapeHtml(lines(p.includes))}</textarea></label>
-      <label>Багтахгүй<textarea name="notIncludes" rows="3">${escapeHtml(lines(p.notIncludes))}</textarea></label>
-      <label>Хэнд<textarea name="audience" rows="2">${escapeHtml(lines(p.audience))}</textarea></label>
-      <label>Агуулга<textarea name="toc" rows="3">${escapeHtml(lines(p.toc))}</textarea></label>
-      <label>Урьдчилсан уншлага<textarea name="preview" rows="3">${escapeHtml(lines(p.preview))}</textarea></label>
+      <label>Товч (MN)<input name="excerpt" value="${escapeAttr(p.excerpt || "")}"></label>
+      <label>Excerpt (EN)<input name="excerptEn" value="${escapeAttr(p.excerptEn || "")}"></label>
+      <label>Тайлбар (MN)<textarea name="description" rows="4">${escapeHtml(p.description || "")}</textarea></label>
+      <label>Description (EN)<textarea name="descriptionEn" rows="4">${escapeHtml(p.descriptionEn || "")}</textarea></label>
+      <label>Багтана (MN)<textarea name="includes" rows="4">${escapeHtml(lines(p.includes))}</textarea></label>
+      <label>Included (EN)<textarea name="includesEn" rows="4">${escapeHtml(lines(p.includesEn))}</textarea></label>
+      <label>Багтахгүй (MN)<textarea name="notIncludes" rows="3">${escapeHtml(lines(p.notIncludes))}</textarea></label>
+      <label>Not included (EN)<textarea name="notIncludesEn" rows="3">${escapeHtml(lines(p.notIncludesEn))}</textarea></label>
+      <label>Хэнд (MN)<textarea name="audience" rows="2">${escapeHtml(lines(p.audience))}</textarea></label>
+      <label>Audience (EN)<textarea name="audienceEn" rows="2">${escapeHtml(lines(p.audienceEn))}</textarea></label>
+      <label>Агуулга (MN)<textarea name="toc" rows="3">${escapeHtml(lines(p.toc))}</textarea></label>
+      <label>Contents (EN)<textarea name="tocEn" rows="3">${escapeHtml(lines(p.tocEn))}</textarea></label>
+      <label>Урьдчилсан уншлага (MN)<textarea name="preview" rows="3">${escapeHtml(lines(p.preview))}</textarea></label>
+      <label>Preview (EN)<textarea name="previewEn" rows="3">${escapeHtml(lines(p.previewEn))}</textarea></label>
       <label class="check"><input type="checkbox" name="featured" ${p.featured ? "checked" : ""}><span>Нүүр хуудсанд онцлох</span></label>
       <label class="check"><input type="checkbox" name="published" ${p.published !== false ? "checked" : ""}><span>Дэлгүүрт харагдуулах</span></label>
       <div class="admin-actions">
@@ -209,34 +218,48 @@ function viewStore() {
     <form id="store-form" class="buy-box" method="post" action="#">
       <h2>Дэлгүүрийн мэдээлэл</h2>
       <label>Нэр<input name="name" required value="${escapeAttr(s.name || "")}"></label>
-      <label>Уриа (логоны доор)<input name="tagline" value="${escapeAttr(s.tagline || "")}"></label>
-      <h2>Нүүр хуудасны үг</h2>
-      <label>Дээд жижиг үг<input name="kicker" value="${escapeAttr(s.kicker || "")}"></label>
-      <label>Том гарчиг<input name="headline" value="${escapeAttr(s.headline || "")}"></label>
-      <label>Том тайлбар<textarea name="description" rows="3">${escapeHtml(s.description || "")}</textarea></label>
-      <label>Баруун талын нэмэлт үг<textarea name="heroAside" rows="2">${escapeHtml(s.heroAside || "")}</textarea></label>
-      <label>Онцлох хэсгийн тайлбар<input name="featuredHint" value="${escapeAttr(s.featuredHint || "")}"></label>
-      <label>Доод мэдэгдэл<textarea name="notice" rows="2">${escapeHtml(s.notice || "")}</textarea></label>
+      <label>Уриа MN<input name="tagline" value="${escapeAttr(s.tagline || "")}"></label>
+      <label>Tagline EN<input name="taglineEn" value="${escapeAttr(s.taglineEn || "")}"></label>
+      <h2>Нүүр хуудасны үг · MN / EN</h2>
+      <label>Дээд жижиг үг MN<input name="kicker" value="${escapeAttr(s.kicker || "")}"></label>
+      <label>Kicker EN<input name="kickerEn" value="${escapeAttr(s.kickerEn || "")}"></label>
+      <label>Том гарчиг MN<input name="headline" value="${escapeAttr(s.headline || "")}"></label>
+      <label>Headline EN<input name="headlineEn" value="${escapeAttr(s.headlineEn || "")}"></label>
+      <label>Том тайлбар MN<textarea name="description" rows="3">${escapeHtml(s.description || "")}</textarea></label>
+      <label>Description EN<textarea name="descriptionEn" rows="3">${escapeHtml(s.descriptionEn || "")}</textarea></label>
+      <label>Баруун талын нэмэлт үг MN<textarea name="heroAside" rows="2">${escapeHtml(s.heroAside || "")}</textarea></label>
+      <label>Aside EN<textarea name="heroAsideEn" rows="2">${escapeHtml(s.heroAsideEn || "")}</textarea></label>
+      <label>Онцлох тайлбар MN<input name="featuredHint" value="${escapeAttr(s.featuredHint || "")}"></label>
+      <label>Featured hint EN<input name="featuredHintEn" value="${escapeAttr(s.featuredHintEn || "")}"></label>
+      <label>Доод мэдэгдэл MN<textarea name="notice" rows="2">${escapeHtml(s.notice || "")}</textarea></label>
+      <label>Footer notice EN<textarea name="noticeEn" rows="2">${escapeHtml(s.noticeEn || "")}</textarea></label>
       <h2>Хэнд зориулсан бэ</h2>
-      <p class="muted">Нүүрэн дээрх хайрцагнууд. Нэмж, хасаж, үгийг нь солино.</p>
-      <label>Хэсгийн гарчиг<input name="audienceTitle" value="${escapeAttr(s.audienceTitle || "Хэнд зориулсан бэ")}"></label>
+      <p class="muted">Нүүрэн дээрх хайрцагнууд. Монгол болон англи үгийг хамт бичнэ.</p>
+      <label>Хэсгийн гарчиг MN<input name="audienceTitle" value="${escapeAttr(s.audienceTitle || "Хэнд зориулсан бэ")}"></label>
+      <label>Section title EN<input name="audienceTitleEn" value="${escapeAttr(s.audienceTitleEn || "")}"></label>
       ${(state.audience || []).map((item, index) => `
-        <div class="aud-row">
-          <label>Нэр<input name="aud-title-${index}" value="${escapeAttr(item.title || "")}" placeholder="Жишээ: Багш"></label>
-          <label>Тайлбар<input name="aud-text-${index}" value="${escapeAttr(item.text || "")}" placeholder="Энэ хүнд юу өгөх вэ"></label>
+        <div class="aud-row aud-row-en">
+          <label>Нэр MN<input name="aud-title-${index}" value="${escapeAttr(item.title || "")}" placeholder="Жишээ: Багш"></label>
+          <label>Name EN<input name="aud-titleEn-${index}" value="${escapeAttr(item.titleEn || "")}" placeholder="e.g. Teachers"></label>
+          <label>Тайлбар MN<input name="aud-text-${index}" value="${escapeAttr(item.text || "")}"></label>
+          <label>Text EN<input name="aud-textEn-${index}" value="${escapeAttr(item.textEn || "")}"></label>
           <button class="linkish" type="button" data-aud-remove="${index}">Хасах</button>
         </div>
       `).join("")}
       <button class="btn ghost" type="button" data-action="aud-add">+ Хэн нэг нэмэх</button>
       <label>Имэйл<input name="email" type="email" value="${escapeAttr(s.email || "")}"></label>
       <label>Утас<input name="phone" value="${escapeAttr(s.phone || "")}"></label>
-      <label>Хот<input name="city" value="${escapeAttr(s.city || "")}"></label>
-      <label>Хүргэлтийн хугацаа<input name="fulfillmentHours" value="${escapeAttr(s.fulfillmentHours || "")}"></label>
+      <label>Хот MN<input name="city" value="${escapeAttr(s.city || "")}"></label>
+      <label>City EN<input name="cityEn" value="${escapeAttr(s.cityEn || "")}"></label>
+      <label>Хүргэлтийн хугацаа MN<input name="fulfillmentHours" value="${escapeAttr(s.fulfillmentHours || "")}"></label>
+      <label>Delivery time EN<input name="fulfillmentHoursEn" value="${escapeAttr(s.fulfillmentHoursEn || "")}"></label>
       <h2>Банк</h2>
-      <label>Банкны нэр<input name="bankName" value="${escapeAttr(b.bankName || "")}"></label>
+      <label>Банкны нэр MN<input name="bankName" value="${escapeAttr(b.bankName || "")}"></label>
+      <label>Bank name EN<input name="bankNameEn" value="${escapeAttr(b.bankNameEn || "")}"></label>
       <label>Данс<input name="account" value="${escapeAttr(b.account || "")}"></label>
       <label>Хүлээн авагч<input name="accountName" value="${escapeAttr(b.accountName || "")}"></label>
-      <label>Тэмдэглэл<textarea name="note" rows="3">${escapeHtml(b.note || "")}</textarea></label>
+      <label>Тэмдэглэл MN<textarea name="note" rows="3">${escapeHtml(b.note || "")}</textarea></label>
+      <label>Note EN<textarea name="noteEn" rows="3">${escapeHtml(b.noteEn || "")}</textarea></label>
       <button class="btn" type="submit">Хадгалах</button>
     </form>
     <form id="password-form" class="buy-box" style="margin-top:16px" method="post" action="#">
@@ -267,7 +290,14 @@ function readAudienceFromForm() {
     const title = form.elements[`aud-title-${index}`];
     const text = form.elements[`aud-text-${index}`];
     if (!title) break;
-    items.push({ title: title.value, text: text ? text.value : "" });
+    const titleEn = form.elements[`aud-titleEn-${index}`];
+    const textEn = form.elements[`aud-textEn-${index}`];
+    items.push({
+      title: title.value,
+      text: text ? text.value : "",
+      titleEn: titleEn ? titleEn.value : "",
+      textEn: textEn ? textEn.value : "",
+    });
   }
   return items;
 }
@@ -280,18 +310,27 @@ async function saveProductForm(form) {
       body: JSON.stringify({
         id: data.get("id"),
         title: data.get("title"),
+        titleEn: data.get("titleEn"),
         subtitle: data.get("subtitle"),
+        subtitleEn: data.get("subtitleEn"),
         category: data.get("category"),
         price: data.get("price"),
         pages: data.get("pages"),
         formats: data.get("formats"),
         excerpt: data.get("excerpt"),
+        excerptEn: data.get("excerptEn"),
         description: data.get("description"),
+        descriptionEn: data.get("descriptionEn"),
         includes: data.get("includes"),
+        includesEn: data.get("includesEn"),
         notIncludes: data.get("notIncludes"),
+        notIncludesEn: data.get("notIncludesEn"),
         audience: data.get("audience"),
+        audienceEn: data.get("audienceEn"),
         toc: data.get("toc"),
+        tocEn: data.get("tocEn"),
         preview: data.get("preview"),
+        previewEn: data.get("previewEn"),
         featured: data.get("featured") === "on",
         published: data.get("published") === "on",
       }),
@@ -338,23 +377,35 @@ document.addEventListener("submit", async (event) => {
         body: JSON.stringify({
           name: data.get("name"),
           tagline: data.get("tagline"),
+          taglineEn: data.get("taglineEn"),
           kicker: data.get("kicker"),
+          kickerEn: data.get("kickerEn"),
           headline: data.get("headline"),
+          headlineEn: data.get("headlineEn"),
           description: data.get("description"),
+          descriptionEn: data.get("descriptionEn"),
           heroAside: data.get("heroAside"),
+          heroAsideEn: data.get("heroAsideEn"),
           featuredHint: data.get("featuredHint"),
+          featuredHintEn: data.get("featuredHintEn"),
           notice: data.get("notice"),
+          noticeEn: data.get("noticeEn"),
           audienceTitle: data.get("audienceTitle"),
+          audienceTitleEn: data.get("audienceTitleEn"),
           audience: readAudienceFromForm(),
           email: data.get("email"),
           phone: data.get("phone"),
           city: data.get("city"),
+          cityEn: data.get("cityEn"),
           fulfillmentHours: data.get("fulfillmentHours"),
+          fulfillmentHoursEn: data.get("fulfillmentHoursEn"),
           bank: {
             bankName: data.get("bankName"),
+            bankNameEn: data.get("bankNameEn"),
             account: data.get("account"),
             accountName: data.get("accountName"),
             note: data.get("note"),
+            noteEn: data.get("noteEn"),
           },
         }),
       });
@@ -403,7 +454,7 @@ document.addEventListener("click", async (event) => {
   }
   if (event.target.closest("[data-action=aud-add]")) {
     state.audience = readAudienceFromForm();
-    if (state.audience.length < 12) state.audience.push({ title: "", text: "" });
+    if (state.audience.length < 12) state.audience.push({ title: "", text: "", titleEn: "", textEn: "" });
     render();
     return;
   }

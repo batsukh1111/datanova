@@ -341,15 +341,23 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
             "nameEn": str(payload.get("nameEn") or name)[:80],
             "mark": str(payload.get("mark") or name[:1] or "D")[:2],
             "tagline": str(payload.get("tagline") or current.get("tagline") or "")[:160],
-            "kicker": str(payload.get("kicker") if payload.get("kicker") is not None else current.get("kicker") or "")[:80],
-            "headline": str(payload.get("headline") if payload.get("headline") is not None else current.get("headline") or "")[:120],
+            "taglineEn": pick_text(payload, current, "taglineEn", 160),
+            "kicker": pick_text(payload, current, "kicker", 80),
+            "kickerEn": pick_text(payload, current, "kickerEn", 80),
+            "headline": pick_text(payload, current, "headline", 120),
+            "headlineEn": pick_text(payload, current, "headlineEn", 120),
             "description": str(payload.get("description") or current.get("description") or "")[:500],
-            "heroAside": str(payload.get("heroAside") if payload.get("heroAside") is not None else current.get("heroAside") or "")[:300],
-            "featuredHint": str(payload.get("featuredHint") if payload.get("featuredHint") is not None else current.get("featuredHint") or "")[:200],
-            "notice": str(payload.get("notice") if payload.get("notice") is not None else current.get("notice") or "")[:300],
-            "audienceTitle": str(
-                payload.get("audienceTitle") if payload.get("audienceTitle") is not None else current.get("audienceTitle") or ""
-            )[:80],
+            "descriptionEn": pick_text(payload, current, "descriptionEn", 500),
+            "heroAside": pick_text(payload, current, "heroAside", 300),
+            "heroAsideEn": pick_text(payload, current, "heroAsideEn", 300),
+            "featuredHint": pick_text(payload, current, "featuredHint", 200),
+            "featuredHintEn": pick_text(payload, current, "featuredHintEn", 200),
+            "notice": pick_text(payload, current, "notice", 300),
+            "noticeEn": pick_text(payload, current, "noticeEn", 300),
+            "audienceTitle": pick_text(payload, current, "audienceTitle", 80),
+            "audienceTitleEn": pick_text(payload, current, "audienceTitleEn", 80),
+            "cityEn": pick_text(payload, current, "cityEn", 80),
+            "fulfillmentHoursEn": pick_text(payload, current, "fulfillmentHoursEn", 80),
             "email": email[:120],
             "phone": str(payload.get("phone") or "")[:30],
             "city": str(payload.get("city") or current.get("city") or "")[:80],
@@ -365,9 +373,17 @@ def save_store(payload: dict) -> tuple[dict | None, str | None]:
         "account": str(bank_in.get("account") or current.get("bank", {}).get("account") or "")[:40],
         "accountName": str(bank_in.get("accountName") or current.get("bank", {}).get("accountName") or "")[:80],
         "note": str(bank_in.get("note") or current.get("bank", {}).get("note") or "")[:300],
+        "bankNameEn": str(bank_in.get("bankNameEn") or current.get("bank", {}).get("bankNameEn") or "")[:80],
+        "noteEn": str(bank_in.get("noteEn") or current.get("bank", {}).get("noteEn") or "")[:300],
     }
     write_json(DATA / "store.json", current)
     return current, None
+
+
+def pick_text(payload: dict, current: dict, key: str, limit: int) -> str:
+    if payload.get(key) is not None:
+        return str(payload.get(key) or "")[:limit]
+    return str(current.get(key) or "")[:limit]
 
 
 def parse_audience(raw) -> list[dict]:
@@ -379,8 +395,10 @@ def parse_audience(raw) -> list[dict]:
             continue
         title = str(row.get("title") or "").strip()[:80]
         text = str(row.get("text") or "").strip()[:240]
-        if title or text:
-            items.append({"title": title, "text": text})
+        title_en = str(row.get("titleEn") or "").strip()[:80]
+        text_en = str(row.get("textEn") or "").strip()[:240]
+        if title or text or title_en or text_en:
+            items.append({"title": title, "text": text, "titleEn": title_en, "textEn": text_en})
     return items
 
 
@@ -450,12 +468,23 @@ def save_product(payload: dict) -> tuple[dict | None, str | None]:
             "includes": lines(payload.get("includes"), existing.get("includes") or []),
             "notIncludes": lines(payload.get("notIncludes"), existing.get("notIncludes") or []),
             "audience": lines(payload.get("audience"), existing.get("audience") or []),
+            "titleEn": str(payload.get("titleEn") or existing.get("titleEn") or "")[:140],
+            "subtitleEn": str(payload.get("subtitleEn") or existing.get("subtitleEn") or "")[:160],
+            "excerptEn": str(payload.get("excerptEn") or existing.get("excerptEn") or "")[:400],
+            "descriptionEn": str(payload.get("descriptionEn") or existing.get("descriptionEn") or "")[:2000],
+            "includesEn": lines(payload.get("includesEn"), existing.get("includesEn") or []),
+            "notIncludesEn": lines(payload.get("notIncludesEn"), existing.get("notIncludesEn") or []),
+            "audienceEn": lines(payload.get("audienceEn"), existing.get("audienceEn") or []),
         }
     )
     if payload.get("toc") is not None:
         existing["toc"] = lines(payload.get("toc"), existing.get("toc") or [])
     if payload.get("preview") is not None:
         existing["preview"] = lines(payload.get("preview"), existing.get("preview") or [])
+    if payload.get("tocEn") is not None:
+        existing["tocEn"] = lines(payload.get("tocEn"), existing.get("tocEn") or [])
+    if payload.get("previewEn") is not None:
+        existing["previewEn"] = lines(payload.get("previewEn"), existing.get("previewEn") or [])
 
     catalog["products"] = products
     write_json(DATA / "products.json", catalog)

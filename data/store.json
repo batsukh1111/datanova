@@ -3,26 +3,53 @@
   "nameEn": "DataNova",
   "mark": "D",
   "tagline": "Судалгааны тайлан, цэвэр өгөгдөл",
+  "taglineEn": "Research reports and clean data",
   "kicker": "Тайлан · өгөгдөл · тойм",
+  "kickerEn": "Reports · data · briefings",
   "headline": "Тоог уншихад бэлэн болгоно",
+  "headlineEn": "Numbers, ready to read",
   "description": "Шийдвэр гаргахад хэрэгтэй тайлан, цэвэр хүснэгт, тоймыг шууд татаж авна. Бэлэн курсийн ажил зардаггүй.",
+  "descriptionEn": "Reports, cleaned tables, and briefings for decisions. We do not sell ready-made coursework.",
   "heroAside": "Одоогийн жишээ бүтээгдэхүүн. Та өөрийн датагаа оруулахад энэ хэсэг солигдоно.",
+  "heroAsideEn": "Sample products for now. Replace them with your own data.",
   "featuredHint": "Онцлох тайлан, өгөгдөл.",
+  "featuredHintEn": "Featured reports and datasets.",
   "audienceTitle": "Хэнд зориулсан бэ",
+  "audienceTitleEn": "Who it is for",
   "audience": [
-    { "title": "Байгууллага", "text": "Үнэ, инфляц, зах зээлийн тоймыг хурдан уншина." },
-    { "title": "Судлаач, сэтгүүлч", "text": "Цэвэр хүснэгт, эх сурвалжтай дүгнэлт авна." },
-    { "title": "Оюутан", "text": "Зөвхөн бичих заавар, загвар. Бэлэн ажил биш." }
+    {
+      "title": "Байгууллага",
+      "titleEn": "Organizations",
+      "text": "Үнэ, инфляц, зах зээлийн тоймыг хурдан уншина.",
+      "textEn": "Read prices, inflation, and market briefings quickly."
+    },
+    {
+      "title": "Судлаач, сэтгүүлч",
+      "titleEn": "Researchers and journalists",
+      "text": "Цэвэр хүснэгт, эх сурвалжтай дүгнэлт авна.",
+      "textEn": "Get cleaned tables and sourced findings."
+    },
+    {
+      "title": "Оюутан",
+      "titleEn": "Students",
+      "text": "Зөвхөн бичих заавар, загвар. Бэлэн ажил биш.",
+      "textEn": "Writing guides and templates only — not finished papers."
+    }
   ],
   "email": "Bayaraa_4068@yahoo.com",
   "phone": "",
   "city": "Улаанбаатар",
+  "cityEn": "Ulaanbaatar",
   "bank": {
     "bankName": "Худалдаа хөгжлийн банк",
+    "bankNameEn": "Trade and Development Bank",
     "account": "350004000457049846",
     "accountName": "Ц.Баярхүү",
-    "note": "Шилжүүлгийн утга дээр захиалгын дугаарыг бичнэ үү. Төлбөр орсон даруйд файлыг имэйлээр илгээнэ."
+    "note": "Шилжүүлгийн утга дээр захиалгын дугаарыг бичнэ үү. Төлбөр орсон даруйд файлыг имэйлээр илгээнэ.",
+    "noteEn": "Put the order number in the transfer description. The file is emailed after payment."
   },
   "fulfillmentHours": "Ажлын 1 өдрийн дотор",
-  "notice": "Энэ сайт албан ёсны статистикийн байгууллагын сайт биш. Энд байгаа зүйлс зохиогчийн өөрийн боловсруулалт юм."
+  "fulfillmentHoursEn": "within 1 business day",
+  "notice": "Энэ сайт албан ёсны статистикийн байгууллагын сайт биш. Энд байгаа зүйлс зохиогчийн өөрийн боловсруулалт юм.",
+  "noticeEn": "This is not an official statistics office website. The work here is the author’s own analysis."
 }
